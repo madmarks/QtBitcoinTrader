@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -32,29 +32,37 @@
 #include "julyspinboxfix.h"
 #include "main.h"
 
-JulySpinBoxFix::JulySpinBoxFix(QDoubleSpinBox *parentSB, int minWid)
-	: QObject()
+JulySpinBoxFix::JulySpinBoxFix(QDoubleSpinBox* parentSB, int minWid)
+    : QObject()
 {
-	if(baseValues.forceDotInSpinBoxes)parentSB->setLocale(QLocale::English);
-    else parentSB->setLocale(QLocale::Ukrainian);
-	pMinimumWidth=minWid;
-	spinMargin=30;
-	if(parentSB->buttonSymbols()==QDoubleSpinBox::NoButtons)spinMargin=6;
-	parentSpinBox=parentSB;
+    if (baseValues.forceDotInSpinBoxes)
+        parentSB->setLocale(QLocale::English);
+    else
+        parentSB->setLocale(QLocale::Ukrainian);
+
+    pMinimumWidth = minWid;
+    spinMargin = 30;
+
+    if (parentSB->buttonSymbols() == QDoubleSpinBox::NoButtons)
+        spinMargin = 8;
+
+    parentSpinBox = parentSB;
     widthFix(parentSB->text());
-	if(!parentSB->suffix().isEmpty())
-	{
-		pMinimumWidth=parentSB->minimumWidth();
-		parentSB->setMinimumWidth(pMinimumWidth);
+
+    if (!parentSB->suffix().isEmpty())
+    {
+        pMinimumWidth = parentSB->minimumWidth();
+        parentSB->setMinimumWidth(pMinimumWidth);
         widthFix(parentSB->text());
     }
-    connect(parentSB,SIGNAL(valueChanged(QString)),this,SLOT(widthFix(QString)));
+
+    connect(parentSB, SIGNAL(valueChanged(QString)), this, SLOT(widthFix(QString)));
 }
 
 void JulySpinBoxFix::widthFix(QString text)
 {
-	if(pMinimumWidth==0)
-		parentSpinBox->setMinimumWidth(textFontWidth(text)+spinMargin);
-	else 
-		parentSpinBox->setMinimumWidth(qMax(textFontWidth(text)+spinMargin,pMinimumWidth));
+    if (pMinimumWidth == 0)
+        parentSpinBox->setMinimumWidth(textFontWidth(text) + spinMargin);
+    else
+        parentSpinBox->setMinimumWidth(qMax(textFontWidth(text) + spinMargin, pMinimumWidth));
 }

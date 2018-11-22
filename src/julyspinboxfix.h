@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -38,15 +38,15 @@
 
 class JulySpinBoxFix : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-    JulySpinBoxFix(QDoubleSpinBox *parent, int minimumWidth=0);
+    JulySpinBoxFix(QDoubleSpinBox* parent, int minimumWidth = 0);
 
 private:
-	int pMinimumWidth;
-	int spinMargin;
-	QDoubleSpinBox *parentSpinBox;
+    int pMinimumWidth;
+    int spinMargin;
+    QDoubleSpinBox* parentSpinBox;
 private slots:
     void widthFix(QString);
 };

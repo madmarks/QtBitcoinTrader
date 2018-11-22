@@ -1,283 +1,321 @@
-equals(QT_MAJOR_VERSION, 4): {
-error("Qt 4 is no longer supported. In order to compile Qt Bitcoin Trader you need update to Qt 5 and C++11");
+lessThan(QT_MAJOR_VERSION, 5) {
+error("Qt 4 is no longer supported. In order to compile Qt Bitcoin Trader you need update to Qt5 http://qt.io/download-open-source/");
 }
 
-QMAKE_CFLAGS_WARN_ON += -Wno-deprecated-declarations -Wno-unused-function
-QMAKE_CXXFLAGS_WARN_ON += -Wno-deprecated-declarations -Wno-unused-function
+lessThan(QT_MAJOR_VERSION, 6) { lessThan(QT_MINOR_VERSION, 9) {
+error("Qt $${QT_VERSION} is no longer supported. In order to compile Qt Bitcoin Trader you need update at least to Qt 5.9 http://qt.io/download-open-source/"); } }
+
+TARGET = QtBitcoinTrader
+
+CONFIG	+= qt c++11
 
 TEMPLATE	= app
 LANGUAGE	= C++
 DEPENDPATH	+= .
 INCLUDEPATH	+= .
-INCLUDEPATH += $$[QT_INSTALL_PREFIX]/src/3rdparty/zlib
 
+QT += network script widgets
+unix:!macx { QT += multimedia }
+macx   { QT += multimedia }
 
-CONFIG	+= qt release
-CONFIG	+= c++11
+LIBS += -lssl -lcrypto -lz
 
- win32 { TARGET = ../Bin/QtBitcoinTrader }
-!win32 { TARGET = QtBitcoinTrader }
-
-QT  += network script
-greaterThan(QT_MAJOR_VERSION, 4): {
-QT += widgets
-!win32 { QT += multimedia }
+        DEFINES += QTBUILDTARGETLINUX64
+linux {
+    contains(QMAKE_TARGET.arch, x86_64) {
+        DEFINES += QTBUILDTARGETLINUX64
+    }
 }
 
-exists("sapi.h"){ DEFINES += SAPI_ENABLED }
+win32 {
+    LIBS += -lgdi32 -lws2_32 -lole32 -lwinmm
+
+    contains(QMAKE_TARGET.arch, x86_64) {
+        DEFINES += QTBUILDTARGETWIN64
+    }
+
+    DEFINES += SAPI_ENABLED
+
+    checkFRAMEWORKDIR=$$(FRAMEWORKDIR)
+    isEmpty(checkFRAMEWORKDIR) {
+        LIBS += -lsapi
+    }
+}
+
+macx {
+    LIBS += -dead_strip
+    LIBS += -framework CoreFoundation
+    LIBS += -framework ApplicationServices
+}
 
 CONFIG(static) {
-  greaterThan(QT_MAJOR_VERSION, 4): {
-   QTPLUGIN.mediaservice=-
-   QTPLUGIN.playlistformats=-
-   QTPLUGIN.position=-
-   QTPLUGIN.printsupport=-
-   QTPLUGIN.bearer=-
-   QTPLUGIN.accessible=-
-   QTPLUGIN.sensors=-
-   QTPLUGIN.sqldrivers=-
-   QTPLUGIN.qmltooling=-
-   QTPLUGIN.designer=-
-   QTPLUGIN.iconengines=-
-   QTPLUGIN.imageformats=-
-   win32 { DEFINES += STATIC_QT5_BUILD }
-  }
-}
-
-win32 { LIBS += -lcrypt32 -leay32 -lssleay32 -luser32 -lgdi32 -ladvapi32 -lz -lws2_32 -lwinmm }
-!win32 { LIBS += -lcrypto -lz }
-
-mac{
-LIBS += -framework CoreFoundation
-LIBS += -framework ApplicationServices
+    QTPLUGIN.mediaservice=-
+    QTPLUGIN.playlistformats=-
+    QTPLUGIN.position=-
+    QTPLUGIN.printsupport=-
+    QTPLUGIN.bearer=-
+    QTPLUGIN.accessible=-
+    QTPLUGIN.sensors=-
+    QTPLUGIN.sqldrivers=-
+    QTPLUGIN.qmltooling=-
+    QTPLUGIN.designer=-
+    QTPLUGIN.iconengines=-
+    QTPLUGIN.imageformats=-
+    QTPLUGIN.geoservices=-
+    QTPLUGIN.position=-
+    QTPLUGIN.qmltooling=-
+    QTPLUGIN.sensorgestures=-
 }
 
 #
 # Headers
 #
-HEADERS += aboutdialog.h \
-           addrulegroup.h \
-           currencyinfo.h \
-           currencypairitem.h \
-           datafolderchusedialog.h \
-           debugviewer.h \
-           depthitem.h \
-           depthmodel.h \
-           exchange.h \
-           exchange_bitfinex.h \
-           exchange_bitstamp.h \
-           exchange_btcchina.h \
-           exchange_btce.h \
-           feecalculator.h \
-           historyitem.h \
-           historymodel.h \
-           julyaes256.h \
-           julyhttp.h \
-           julylightchanges.h \
-           julyrsa.h \
-           julyscrolluponidle.h \
-           julyspinboxfix.h \
-           julyspinboxpicker.h \
-           julytranslator.h \
-           logthread.h \
-           main.h \
-           newpassworddialog.h \
-           orderitem.h \
-           ordersmodel.h \
-           orderstablecancelbutton.h \
-           passworddialog.h \
-           percentpicker.h \
-           qtbitcointrader.h \
-           rulesmodel.h \
-           rulewidget.h \
-           thisfeatureunderdevelopment.h \
-           tradesitem.h \
-           tradesmodel.h \
-           translationdialog.h \
-           translationline.h \
-           updaterdialog.h \
-           apptheme.h \
-           logobutton.h \
-           networkmenu.h \
-           julybuttonmenu.h \
-           scriptwidget.h \
-           scriptobject.h \
-           addscriptwindow.h \
-           julylockfile.h \
-           exchange_gocio.h \
-           featuredexchangesdialog.h \
-           allexchangesdialog.h \
-           allexchangesmodel.h \
-           exchangebutton.h \
-           addruledialog.h \
-           rulescriptparser.h \
-           ruleholder.h \
-           exchange_indacoin.h \
-           julymath.h \
-           exchange_bitcurex.h \
-           exchange_bitmarket.h \
-           platform/sound.h \
-           platform/socket.h \
-           config/config_manager.h \
-           config/config_manager_dialog.h \
-           utils/utils.h \
-           dock/dock_host.h \
-           chartsview.h \
-           chartsmodel.h \
-           settingsdialog.h \
-           settingsgeneral.h \
-           settingsnetworkproxy.h \
-           settingsdialoglistelement.h \
-           settingsdecimals.h \
-    timesync.h \
-    translationmessage.h \
-    indicatorengine.h
+HEADERS += $${PWD}/script/addrulegroup.h \
+           $${PWD}/script/rulesmodel.h \
+           $${PWD}/script/rulewidget.h \
+           $${PWD}/script/scriptwidget.h \
+           $${PWD}/script/scriptobject.h \
+           $${PWD}/script/addscriptwindow.h \
+           $${PWD}/script/addruledialog.h \
+           $${PWD}/script/rulescriptparser.h \
+           $${PWD}/script/ruleholder.h \
+           $${PWD}/script/scriptobjectthread.h \
+           $${PWD}/platform/sound.h \
+           $${PWD}/platform/socket.h \
+           $${PWD}/config/config_manager.h \
+           $${PWD}/config/config_manager_dialog.h \
+           $${PWD}/utils/utils.h \
+           $${PWD}/settings/settingsdialog.h \
+           $${PWD}/settings/settingsgeneral.h \
+           $${PWD}/settings/settingsnetworkproxy.h \
+           $${PWD}/settings/settingsdialoglistelement.h \
+           $${PWD}/settings/settingsdecimals.h \
+           $${PWD}/dock/dock_host.h \
+           $${PWD}/charts/chartsview.h \
+           $${PWD}/charts/chartsmodel.h \
+           $${PWD}/news/newsview.h \
+           $${PWD}/news/newsmodel.h \
+           $${PWD}/aboutdialog.h \
+           $${PWD}/currencyinfo.h \
+           $${PWD}/currencypairitem.h \
+           $${PWD}/datafolderchusedialog.h \
+           $${PWD}/debugviewer.h \
+           $${PWD}/depthitem.h \
+           $${PWD}/depthmodel.h \
+           $${PWD}/exchange/exchange.h \
+           $${PWD}/exchange/exchange_bitfinex.h \
+           $${PWD}/exchange/exchange_bitstamp.h \
+           $${PWD}/exchange/exchange_btcchina.h \
+           $${PWD}/exchange/exchange_wex.h \
+           $${PWD}/exchange/exchange_gocio.h \
+           $${PWD}/exchange/exchange_indacoin.h \
+           $${PWD}/exchange/exchange_bitmarket.h \
+           $${PWD}/exchange/exchange_okcoin.h \
+           $${PWD}/exchange/exchange_yobit.h \
+           $${PWD}/exchange/exchange_binance.h \
+           $${PWD}/exchange/exchange_bittrex.h \
+           $${PWD}/feecalculator.h \
+           $${PWD}/historyitem.h \
+           $${PWD}/historymodel.h \
+           $${PWD}/julyaes256.h \
+           $${PWD}/julyhttp.h \
+           $${PWD}/julylightchanges.h \
+           $${PWD}/julyrsa.h \
+           $${PWD}/julyscrolluponidle.h \
+           $${PWD}/julyspinboxfix.h \
+           $${PWD}/julyspinboxpicker.h \
+           $${PWD}/julytranslator.h \
+           $${PWD}/logthread.h \
+           $${PWD}/main.h \
+           $${PWD}/login/newpassworddialog.h \
+           $${PWD}/orderitem.h \
+           $${PWD}/ordersmodel.h \
+           $${PWD}/orderstablecancelbutton.h \
+           $${PWD}/login/passworddialog.h \
+           $${PWD}/percentpicker.h \
+           $${PWD}/qtbitcointrader.h \
+           $${PWD}/thisfeatureunderdevelopment.h \
+           $${PWD}/tradesitem.h \
+           $${PWD}/tradesmodel.h \
+           $${PWD}/translationdialog.h \
+           $${PWD}/translationline.h \
+           $${PWD}/updaterdialog.h \
+           $${PWD}/apptheme.h \
+           $${PWD}/logobutton.h \
+           $${PWD}/menu/networkmenu.h \
+           $${PWD}/julylockfile.h \
+           $${PWD}/login/featuredexchangesdialog.h \
+           $${PWD}/login/allexchangesdialog.h \
+           $${PWD}/login/allexchangesmodel.h \
+           $${PWD}/login/exchangebutton.h \
+           $${PWD}/login/qttraderinform.h \
+           $${PWD}/julymath.h \
+           $${PWD}/timesync.h \
+           $${PWD}/translationmessage.h \
+           $${PWD}/indicatorengine.h \
+           $${PWD}/menu/currencymenu.h \
+           $${PWD}/menu/currencymenucell.h \
+           $${PWD}/utils/currencysignloader.h \
+           $${PWD}/iniengine.h
 
-FORMS += addrulegroup.ui \
-         datafolderchusedialog.ui \
-         debugviewer.ui \
-         feecalculator.ui \
-         newpassworddialog.ui \
-         passworddialog.ui \
-         percentpicker.ui \
-         qtbitcointrader.ui \
-         rulewidget.ui \
-         thisfeatureunderdevelopment.ui \
-         translationabout.ui \
-         translationdialog.ui \
-         updaterdialog.ui \
-         logobutton.ui \
-         networkmenu.ui \
-         scriptwidget.ui \
-         addscriptwindow.ui \
-         featuredexchangesdialog.ui \
-         allexchangesdialog.ui \
-         exchangebutton.ui \
-         addruledialog.ui \
-         config/config_manager_dialog.ui \
-         chartsview.ui \
-         settingsdialog.ui \
-         settingsgeneral.ui \
-         settingsnetworkproxy.ui \
-         settingsdialoglistelement.ui \
-         settingsdecimals.ui \
-    translationmessage.ui
+FORMS += $${PWD}/script/addrulegroup.ui \
+         $${PWD}/script/rulewidget.ui \
+         $${PWD}/script/scriptwidget.ui \
+         $${PWD}/script/addscriptwindow.ui \
+         $${PWD}/script/addruledialog.ui \
+         $${PWD}/config/config_manager_dialog.ui \
+         $${PWD}/charts/chartsview.ui \
+         $${PWD}/news/newsview.ui \
+         $${PWD}/settings/settingsdialog.ui \
+         $${PWD}/settings/settingsgeneral.ui \
+         $${PWD}/settings/settingsnetworkproxy.ui \
+         $${PWD}/settings/settingsdialoglistelement.ui \
+         $${PWD}/settings/settingsdecimals.ui \
+         $${PWD}/datafolderchusedialog.ui \
+         $${PWD}/debugviewer.ui \
+         $${PWD}/feecalculator.ui \
+         $${PWD}/login/newpassworddialog.ui \
+         $${PWD}/login/passworddialog.ui \
+         $${PWD}/percentpicker.ui \
+         $${PWD}/qtbitcointrader.ui \
+         $${PWD}/thisfeatureunderdevelopment.ui \
+         $${PWD}/translationabout.ui \
+         $${PWD}/translationdialog.ui \
+         $${PWD}/updaterdialog.ui \
+         $${PWD}/logobutton.ui \
+         $${PWD}/menu/networkmenu.ui \
+         $${PWD}/login/featuredexchangesdialog.ui \
+         $${PWD}/login/allexchangesdialog.ui \
+         $${PWD}/login/exchangebutton.ui \
+         $${PWD}/translationmessage.ui \
+         $${PWD}/menu/currencymenu.ui \
+         $${PWD}/menu/currencymenucell.ui
 
-SOURCES += aboutdialog.cpp \
-           addrulegroup.cpp \
-           currencypairitem.cpp \
-           datafolderchusedialog.cpp \
-           debugviewer.cpp \
-           depthitem.cpp \
-           depthmodel.cpp \
-           exchange.cpp \
-           exchange_bitfinex.cpp \
-           exchange_bitstamp.cpp \
-           exchange_btcchina.cpp \
-           exchange_btce.cpp \
-           feecalculator.cpp \
-           historyitem.cpp \
-           historymodel.cpp \
-           julyaes256.cpp \
-           julyhttp.cpp \
-           julylightchanges.cpp \
-           julyrsa.cpp \
-           julyscrolluponidle.cpp \
-           julyspinboxfix.cpp \
-           julyspinboxpicker.cpp \
-           julytranslator.cpp \
-           logthread.cpp \
-           main.cpp \
-           newpassworddialog.cpp \
-           orderitem.cpp \
-           ordersmodel.cpp \
-           orderstablecancelbutton.cpp \
-           passworddialog.cpp \
-           percentpicker.cpp \
-           qtbitcointrader.cpp \
-           rulesmodel.cpp \
-           rulewidget.cpp \
-           thisfeatureunderdevelopment.cpp \
-           tradesitem.cpp \
-           tradesmodel.cpp \
-           translationdialog.cpp \
-           translationline.cpp \
-           updaterdialog.cpp \
-           apptheme.cpp \
-           logobutton.cpp \
-           networkmenu.cpp \
-           julybuttonmenu.cpp \
-           scriptwidget.cpp \
-           scriptobject.cpp \
-           addscriptwindow.cpp \
-           julylockfile.cpp \
-           exchange_gocio.cpp \
-           featuredexchangesdialog.cpp \
-           allexchangesdialog.cpp \
-           allexchangesmodel.cpp \
-           exchangebutton.cpp \
-           addruledialog.cpp \
-           rulescriptparser.cpp \
-           ruleholder.cpp \
-           exchange_indacoin.cpp \
-           exchange_bitcurex.cpp \
-           exchange_bitmarket.cpp \
-           platform/sound.cpp \
-           platform/socket.cpp \
-           config/config_manager.cpp \
-           config/config_manager_dialog.cpp \
-           utils/utils.cpp \
-           dock/dock_host.cpp \
-           chartsview.cpp \
-           chartsmodel.cpp \
-           settingsdialog.cpp \
-           settingsgeneral.cpp \
-           settingsnetworkproxy.cpp \
-           settingsdialoglistelement.cpp \
-           settingsdecimals.cpp \
-    timesync.cpp \
-    translationmessage.cpp \
-    indicatorengine.cpp
+SOURCES +=$${PWD}/script/addrulegroup.cpp \
+          $${PWD}/script/rulesmodel.cpp \
+          $${PWD}/script/rulewidget.cpp \
+          $${PWD}/script/scriptwidget.cpp \
+          $${PWD}/script/scriptobject.cpp \
+          $${PWD}/script/addscriptwindow.cpp \
+          $${PWD}/script/addruledialog.cpp \
+          $${PWD}/script/rulescriptparser.cpp \
+          $${PWD}/script/ruleholder.cpp \
+          $${PWD}/script/scriptobjectthread.cpp \
+          $${PWD}/platform/sound.cpp \
+          $${PWD}/platform/socket.cpp \
+          $${PWD}/config/config_manager.cpp \
+          $${PWD}/config/config_manager_dialog.cpp \
+          $${PWD}/utils/utils.cpp \
+          $${PWD}/dock/dock_host.cpp \
+          $${PWD}/charts/chartsview.cpp \
+          $${PWD}/charts/chartsmodel.cpp \
+          $${PWD}/news/newsview.cpp \
+          $${PWD}/news/newsmodel.cpp \
+          $${PWD}/settings/settingsdialog.cpp \
+          $${PWD}/settings/settingsgeneral.cpp \
+          $${PWD}/settings/settingsnetworkproxy.cpp \
+          $${PWD}/settings/settingsdialoglistelement.cpp \
+          $${PWD}/settings/settingsdecimals.cpp \
+          $${PWD}/aboutdialog.cpp \
+          $${PWD}/currencypairitem.cpp \
+          $${PWD}/datafolderchusedialog.cpp \
+          $${PWD}/debugviewer.cpp \
+          $${PWD}/depthitem.cpp \
+          $${PWD}/depthmodel.cpp \
+          $${PWD}/exchange/exchange.cpp \
+          $${PWD}/exchange/exchange_bitfinex.cpp \
+          $${PWD}/exchange/exchange_bitstamp.cpp \
+          $${PWD}/exchange/exchange_btcchina.cpp \
+          $${PWD}/exchange/exchange_wex.cpp \
+          $${PWD}/exchange/exchange_gocio.cpp \
+          $${PWD}/exchange/exchange_indacoin.cpp \
+          $${PWD}/exchange/exchange_bitmarket.cpp \
+          $${PWD}/exchange/exchange_okcoin.cpp \
+          $${PWD}/exchange/exchange_yobit.cpp \
+          $${PWD}/exchange/exchange_binance.cpp \
+          $${PWD}/exchange/exchange_bittrex.cpp \
+          $${PWD}/feecalculator.cpp \
+          $${PWD}/historyitem.cpp \
+          $${PWD}/historymodel.cpp \
+          $${PWD}/julyaes256.cpp \
+          $${PWD}/julyhttp.cpp \
+          $${PWD}/julylightchanges.cpp \
+          $${PWD}/julyrsa.cpp \
+          $${PWD}/julyscrolluponidle.cpp \
+          $${PWD}/julyspinboxfix.cpp \
+          $${PWD}/julyspinboxpicker.cpp \
+          $${PWD}/julytranslator.cpp \
+          $${PWD}/logthread.cpp \
+          $${PWD}/main.cpp \
+          $${PWD}/login/newpassworddialog.cpp \
+          $${PWD}/orderitem.cpp \
+          $${PWD}/ordersmodel.cpp \
+          $${PWD}/orderstablecancelbutton.cpp \
+          $${PWD}/login/passworddialog.cpp \
+          $${PWD}/percentpicker.cpp \
+          $${PWD}/qtbitcointrader.cpp \
+          $${PWD}/thisfeatureunderdevelopment.cpp \
+          $${PWD}/tradesitem.cpp \
+          $${PWD}/tradesmodel.cpp \
+          $${PWD}/translationdialog.cpp \
+          $${PWD}/translationline.cpp \
+          $${PWD}/updaterdialog.cpp \
+          $${PWD}/apptheme.cpp \
+          $${PWD}/logobutton.cpp \
+          $${PWD}/menu/networkmenu.cpp \
+          $${PWD}/julylockfile.cpp \
+          $${PWD}/login/featuredexchangesdialog.cpp \
+          $${PWD}/login/allexchangesdialog.cpp \
+          $${PWD}/login/allexchangesmodel.cpp \
+          $${PWD}/login/exchangebutton.cpp \
+          $${PWD}/login/qttraderinform.cpp \
+          $${PWD}/timesync.cpp \
+          $${PWD}/translationmessage.cpp \
+          $${PWD}/indicatorengine.cpp \
+          $${PWD}/menu/currencymenu.cpp \
+          $${PWD}/menu/currencymenucell.cpp \
+          $${PWD}/utils/currencysignloader.cpp \
+          $${PWD}/iniengine.cpp
 
 #
 # Resources
 # 
-RESOURCES += QtResource.qrc
+RESOURCES += $${PWD}/QtResource.qrc
 
 #
 # Platform dependent stuff
 #
 unix:!macx {
-UI_DIR = .ui
-MOC_DIR = .moc
-OBJECTS_DIR = .obj
-isEmpty( PREFIX ) {
-    PREFIX=/usr
-}
-isEmpty( DESKTOPDIR ) {
-    DESKTOPDIR=/usr/share/applications
-}
-isEmpty( ICONDIR ) {
-    ICONDIR=/usr/share/pixmaps
-}
+    UI_DIR = .ui
+    MOC_DIR = .moc
+    OBJECTS_DIR = .obj
+    isEmpty( PREFIX ) {
+        PREFIX=/usr
+    }
+    isEmpty( DESKTOPDIR ) {
+        DESKTOPDIR=/usr/share/applications
+    }
+    isEmpty( ICONDIR ) {
+        ICONDIR=/usr/share/pixmaps
+    }
 
-target.path = $${PREFIX}/bin
+    target.path = $${PREFIX}/bin
 
-INSTALLS = target
+    INSTALLS = target
 
-desktop.path = $${DESKTOPDIR}
+    desktop.path = $${DESKTOPDIR}
 
-desktop.files = QtBitcoinTrader.desktop
-INSTALLS += desktop
+    desktop.files = QtBitcoinTrader.desktop
+    INSTALLS += desktop
 
-icon.path = $${ICONDIR}
+    icon.path = $${ICONDIR}
 
-icon.files = QtBitcoinTrader.png
-INSTALLS += icon
+    icon.files = QtBitcoinTrader.png
+    INSTALLS += icon
 }
 ################################
-win32 {
-RC_FILE = WinResource.rc
-}
+win32:RC_FILE = $${PWD}/WinResource.rc
 
 macx:ICON = $${PWD}/QtBitcoinTrader.icns
+macx:QMAKE_INFO_PLIST = $${PWD}/QtBitcoinTrader.plist
+

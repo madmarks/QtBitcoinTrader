@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -35,9 +35,9 @@
 
 
 ConfigManagerDialog::ConfigManagerDialog(QWidget* parent) :
-    QDialog     (parent),
-    ui          (new Ui::ConfigManagerDialog),
-    nameChanging    (false)
+    QDialog(parent),
+    ui(new Ui::ConfigManagerDialog),
+    nameChanging(false)
 {
     ui->setupUi(this);
 
@@ -66,7 +66,9 @@ ConfigManagerDialog::~ConfigManagerDialog()
 void ConfigManagerDialog::onBtnConfigSave()
 {
     QString name = ui->editName->text();
-    if(!::config->defaultNamesTr.contains(name)){
+
+    if (!::config->defaultNamesTr.contains(name))
+    {
         ::config->save(name);
         close();
     }
@@ -99,24 +101,30 @@ void ConfigManagerDialog::onNameTextChanged(const QString& text)
     ui->btnSave->setEnabled(!text.trimmed().isEmpty());
     nameChanging = true;
     selectNameInList(text);
-    if(config->defaultNamesTr.contains(text)){
+
+    if (config->defaultNamesTr.contains(text))
+    {
         ui->btnSave->setEnabled(false);
     }
+
     nameChanging = false;
 }
 
 void ConfigManagerDialog::onNameListCurrentTextChanged(const QString& text)
 {
-    if (!nameChanging) {
+    if (!nameChanging)
+    {
         ui->editName->setText(text);
     }
 
-    if(config->defaultNamesTr.contains(text)){
+    if (config->defaultNamesTr.contains(text))
+    {
         ui->btnLoad->setEnabled(true);
         ui->btnSave->setEnabled(false);
         ui->btnRemove->setEnabled(false);
     }
-    else {
+    else
+    {
         bool nameExists = ::config->getConfigNames().contains(text);
         ui->btnLoad->setEnabled(nameExists);
         ui->btnSave->setEnabled(true);

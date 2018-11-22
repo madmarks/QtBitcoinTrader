@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -38,20 +38,20 @@
 
 class JulyLightChanges : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	JulyLightChanges(QDoubleSpinBox *parent);
-	~JulyLightChanges();
+    explicit JulyLightChanges(QDoubleSpinBox* parent);
+    ~JulyLightChanges();
 private:
-	double lastValue;
-	QDoubleSpinBox *parentSpinBox;
-	QTimer *changeTimer;
+    double lastValue;
+    QDoubleSpinBox* parentSpinBox;
+    QTimer* changeTimer;
 private slots:
-	void changeTimerSlot();
+    void changeTimerSlot();
 public slots:
-	void valueChanged(double);
-	
+    void valueChanged(double);
+
 };
 
 #endif // JULYLIGHTCHANGES_H

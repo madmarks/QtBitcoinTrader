@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -32,25 +32,26 @@
 #include "socket.h"
 
 #ifdef Q_OS_WIN
-#include <Windows.h>
+    #include <Windows.h>
 #else
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/time.h>
+    #include <sys/types.h>
+    #include <sys/socket.h>
+    #include <sys/time.h>
 #endif
 
 
-namespace Platform {
+namespace Platform
+{
 
 void setSocketTimeout(qintptr socket, int timeout)
 {
 #ifdef Q_OS_WIN
-        setsockopt((SOCKET) socket, SOL_SOCKET, SO_RCVTIMEO, (const char*) &timeout, sizeof(int));
+    setsockopt((SOCKET) socket, SOL_SOCKET, SO_RCVTIMEO, (const char*) &timeout, sizeof(int));
 #else
-        struct timeval vtime;
-        vtime.tv_sec = timeout / 1000;
-        vtime.tv_usec = timeout * 1000 - vtime.tv_sec * 1000000;
-        setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, &vtime, sizeof(struct timeval));
+    struct timeval vtime;
+    vtime.tv_sec = timeout / 1000;
+    vtime.tv_usec = timeout * 1000 - vtime.tv_sec * 1000000;
+    setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, &vtime, sizeof(struct timeval));
 #endif
 }
 

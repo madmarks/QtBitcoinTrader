@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -38,36 +38,46 @@
 
 class JulyTranslator : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	QMap<QString,QString>labelMap;
-	QMap<QString,QString>groupBoxMap;
-	QMap<QString,QString>checkBoxMap;
-	QMap<QString,QString>buttonMap;
-	QMap<QString,QString>spinBoxMap;
-	QMap<QString,QString>stringMap;
+    QMap<QString, QString>labelMap;
+    QMap<QString, QString>groupBoxMap;
+    QMap<QString, QString>checkBoxMap;
+    QMap<QString, QString>buttonMap;
+    QMap<QString, QString>spinBoxMap;
+    QMap<QString, QString>stringMap;
 
-	QString lastFile(){return lastLangFile;}
-	int loadFromFile(const QString &fileName);
-	int saveToFile(const QString &fileName);
-	void clearMaps(){labelMap.clear();lastLangFile.clear();groupBoxMap.clear();checkBoxMap.clear();buttonMap.clear();}
-	void loadMapFromUi(QWidget *wid);
-	void translateUi(QWidget *wid);
+    QString lastFile()
+    {
+        return lastLangFile;
+    }
+    int loadFromFile(const QString& fileName);
+    int saveToFile(const QString& fileName);
+    void clearMaps()
+    {
+        labelMap.clear();
+        lastLangFile.clear();
+        groupBoxMap.clear();
+        checkBoxMap.clear();
+        buttonMap.clear();
+    }
+    void loadMapFromUi(QWidget* wid);
+    void translateUi(QWidget* wid);
 
-	QString translateButton(const QString &tid, const QString &defaultText);
-	QString translateLabel(const QString &tid, const QString &defaultText);
-	QString translateCheckBox(const QString &tid, const QString &defaultText);
-	QString translateGroupBox(const QString &tid, const QString &defaultText);
-	QString translateSpinBox(const QString &tid, const QString &defaultText);
-	QString translateString(const QString &tid, const QString &defaultText);
+    QString translateButton(const QString& tid, const QString& defaultText);
+    QString translateLabel(const QString& tid, const QString& defaultText);
+    QString translateCheckBox(const QString& tid, const QString& defaultText);
+    QString translateGroupBox(const QString& tid, const QString& defaultText);
+    QString translateSpinBox(const QString& tid, const QString& defaultText);
+    QString translateString(const QString& tid, const QString& defaultText);
 private:
-	QString lastLangFile;
-	bool fillMapsFromLine(QMap<QString,QString> *map, QString line, const QString &prefix);
-	void fillMapsFromList(const QStringList &list);
-	QStringList getMapList(QMap<QString,QString> *map, QString prefix);
+    QString lastLangFile;
+    bool fillMapsFromLine(QMap<QString, QString>* map, QString line, const QString& prefix);
+    void fillMapsFromList(const QStringList& list);
+    QStringList getMapList(QMap<QString, QString>* map, QString prefix);
 signals:
-	void languageChanged();
+    void languageChanged();
 };
 
 #endif // JULYTRANSLATOR_H

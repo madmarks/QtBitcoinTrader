@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -32,14 +32,13 @@
 #include "thisfeatureunderdevelopment.h"
 #include "main.h"
 
-ThisFeatureUnderDevelopment::ThisFeatureUnderDevelopment(QWidget *parent)
-	: QDialog(parent)
+ThisFeatureUnderDevelopment::ThisFeatureUnderDevelopment(QWidget* parent)
+    : QDialog(parent)
 {
-	if(parent==0)parent=this;
-	ui.setupUi(this);
-	setWindowFlags(Qt::WindowCloseButtonHint);
-	themeChanged();
-	connect(baseValues.mainWindow_,SIGNAL(themeChanged()),this,SLOT(themeChanged()));
+    ui.setupUi(this);
+    setWindowFlags(Qt::WindowCloseButtonHint);
+    themeChanged();
+    connect(baseValues.mainWindow_, SIGNAL(themeChanged()), this, SLOT(themeChanged()));
 }
 
 ThisFeatureUnderDevelopment::~ThisFeatureUnderDevelopment()
@@ -49,5 +48,6 @@ ThisFeatureUnderDevelopment::~ThisFeatureUnderDevelopment()
 
 void ThisFeatureUnderDevelopment::themeChanged()
 {
-	ui.labelNotAvailable->setStyleSheet("background: "+baseValues.appTheme.white.name()+"; border-radius: 8px; border: 1px solid "+baseValues.appTheme.gray.name());
+    ui.labelNotAvailable->setStyleSheet("background: " + baseValues.appTheme.white.name() +
+                                        "; border-radius: 8px; border: 1px solid " + baseValues.appTheme.gray.name());
 }

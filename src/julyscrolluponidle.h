@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -38,18 +38,18 @@
 
 class JulyScrollUpOnIdle : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	JulyScrollUpOnIdle(QScrollBar *parent);
-	~JulyScrollUpOnIdle();
+    explicit JulyScrollUpOnIdle(QScrollBar* parent);
+    ~JulyScrollUpOnIdle();
 
 private:
-	QTimer *idleTimer;
-	QScrollBar *scrollBar;
+    QTimer* idleTimer;
+    QScrollBar* scrollBar;
 private slots:
-	void timeOut();
-	void valueChanged(int);
+    void timeOut();
+    void valueChanged(int);
 
 };
 

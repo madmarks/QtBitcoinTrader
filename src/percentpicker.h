@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -42,21 +42,24 @@
 
 class PercentPicker : public QMenu
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-    PercentPicker(QDoubleSpinBox *spinBox, double maxValue);
-	~PercentPicker();
-	void setValue(int val){ui.verticalSlider->setValue(val);}
+    PercentPicker(QDoubleSpinBox* spinBox, double maxValue);
+    ~PercentPicker();
+    void setValue(int val)
+    {
+        ui.verticalSlider->setValue(val);
+    }
 private:
-    void keyPressEvent(QKeyEvent *event);
-	void mouseReleaseEvent(QMouseEvent *);
-    QDoubleSpinBox *spinBox;
-	double maxValue;
-	Ui::PercentPicker ui;
+    void keyPressEvent(QKeyEvent* event);
+    void mouseReleaseEvent(QMouseEvent*);
+    QDoubleSpinBox* spinBox;
+    double maxValue;
+    Ui::PercentPicker ui;
 private slots:
-	void on_percentTo1_clicked();
-	void on_verticalSlider_valueChanged(int);
+    void on_percentTo1_clicked();
+    void on_verticalSlider_valueChanged(int);
 };
 
 #endif // PERCENTPICKER_H

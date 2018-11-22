@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -37,7 +37,8 @@
 class QListWidgetItem;
 
 
-namespace Ui {
+namespace Ui
+{
 class ConfigManagerDialog;
 }
 
@@ -50,9 +51,6 @@ public:
     explicit ConfigManagerDialog(QWidget* parent = NULL);
     ~ConfigManagerDialog();
 
-private:
-    Ui::ConfigManagerDialog *ui;
-
 private Q_SLOTS:
     void onBtnConfigSave();
     void onBtnConfigLoad();
@@ -64,9 +62,8 @@ private Q_SLOTS:
     void onNameListItemDoubleClicked(QListWidgetItem* item);
 
 private:
+    Ui::ConfigManagerDialog* ui;
+    bool nameChanging;
+
     void selectNameInList(const QString& name);
-
-private:
-    bool            nameChanging;
 };
-

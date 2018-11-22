@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -38,26 +38,29 @@
 
 class TranslationLine : public QTextEdit
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	bool isChanged(){return toPlainText()!=defaultText;}
-	QString getValidText();
-	void setItemText(QString);
-	void setDefaultText(QString defText);
-	TranslationLine(QWidget *parent=0);
-	~TranslationLine();
+    bool isChanged()
+    {
+        return toPlainText() != defaultText;
+    }
+    QString getValidText();
+    void setItemText(QString);
+    void setDefaultText(QString defText);
+    explicit TranslationLine(QWidget* parent = 0);
+    ~TranslationLine();
 private:
-	void focusInEvent(QFocusEvent *e);
-	void focusOutEvent(QFocusEvent *e);
-	QString defaultText;
-	bool fixingSize;
-	void resizeEvent(QResizeEvent *event);
-	void fixSize();
+    void focusInEvent(QFocusEvent* e);
+    void focusOutEvent(QFocusEvent* e);
+    QString defaultText;
+    bool fixingSize;
+    void resizeEvent(QResizeEvent* event);
+    void fixSize();
 signals:
-	void lineTextChanged();
+    void lineTextChanged();
 private slots:
-	void textChangedSlot();	
+    void textChangedSlot();
 };
 
 #endif // TRANSLATIONLINE_H

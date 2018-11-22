@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -33,71 +33,119 @@
 #include "main.h"
 #include <QCryptographicHash>
 #include <QUdpSocket>
+#include <QNetworkProxy>
 #include <QFile>
 #include <QDir>
 #include <QTime>
 #include <QTimer>
 #include "timesync.h"
 
-JulyLockFile::JulyLockFile(QString imageName)
+JulyLockFile::JulyLockFile(QString imageName, QString tempDir)
     : QObject()
-{	
-    qsrand(QDateTime::fromTime_t(TimeSync::getTimeT()).time().msecsTo(QTime(23,59,59,999)));
-    lockFile=new QFile;
-    lockSocket=new QUdpSocket;
-    isLockedFile=false;
-    lockPort=0;
+{
+    qsrand(QDateTime::fromTime_t(TimeSync::getTimeT()).time().msecsTo(QTime(23, 59, 59, 999)));
+    lockFile = new QFile;
+    lockSocket = new QUdpSocket;
+    QNetworkProxy proxy;
+    proxy.setType(QNetworkProxy::NoProxy);
+    lockSocket->setProxy(proxy);
+    isLockedFile = false;
+    lockPort = 0;
 
-    lockFilePath=QDir().tempPath()+"/Locked_"+QCryptographicHash::hash(imageName.toUtf8(),QCryptographicHash::Md5).toHex()+".lockfile";
-    if(QFile::exists(lockFilePath)&&QFileInfo(lockFilePath).lastModified().addSecs(240).toTime_t()<TimeSync::getTimeT())QFile::remove(lockFilePath);
+    if (tempDir.isEmpty())
+        tempDir = QDir().tempPath();
+
+    lockFilePath = QDir().tempPath() + "/Locked_" + QCryptographicHash::hash(imageName.toUtf8(),
+                   QCryptographicHash::Md5).toHex() + ".lockfile";
+
+    if (QFile::exists(lockFilePath) &&
+        QFileInfo(lockFilePath).lastModified().addSecs(240).toTime_t() < TimeSync::getTimeT())
+        QFile::remove(lockFilePath);
+
     lockFile->setFileName(lockFilePath);
-    if(QFile::exists(lockFilePath))
+
+    if (QFile::exists(lockFilePath))
     {
-        if(lockFile->open(QIODevice::ReadOnly))
+        if (lockFile->open(QIODevice::ReadOnly))
         {
-            lockPort=lockFile->readAll().trimmed().toUInt();
+            lockPort = lockFile->readAll().trimmed().toUShort();
             lockFile->close();
         }
 
-        if(lockPort>0)
+        if (lockPort > 0)
         {
-            isLockedFile=!lockSocket->bind(QHostAddress::LocalHost,lockPort,QUdpSocket::DontShareAddress);
-            if(isLockedFile)return;
+            isLockedFile = !lockSocket->bind(QHostAddress::LocalHost, lockPort, QUdpSocket::DontShareAddress);
+
+            if (isLockedFile)
+                return;
         }
     }
 
-    if(lockPort==0||lockSocket->state()!=QUdpSocket::BoundState)
+    if (lockPort == 0 || lockSocket->state() != QUdpSocket::BoundState)
     {
-        lockPort=1999+qrand()%2000;
-        while(!lockSocket->bind(QHostAddress::LocalHost,++lockPort,QUdpSocket::DontShareAddress));
+        lockPort = 1999 + qrand() % 2000;
+        int i = 0;
+
+        while (!lockSocket->bind(QHostAddress::LocalHost, ++lockPort, QUdpSocket::DontShareAddress))
+        {
+            i++;
+
+            if (i > 100)
+            {
+                if (lockFile->isOpen())
+                {
+                    lockFile->close();
+                    lockFile->remove(lockFilePath);
+                }
+
+                isLockedFile = false;
+                return;
+            }
+        }
     }
 
-    QTimer *minuteTimer=new QTimer(this);
-    connect(minuteTimer,SIGNAL(timeout()),this,SLOT(updateLockFile()));
+    QTimer* minuteTimer = new QTimer(this);
+    connect(minuteTimer, SIGNAL(timeout()), this, SLOT(updateLockFile()));
     minuteTimer->start(60000);
     updateLockFile();
-    isLockedFile=lockSocket->state()!=QUdpSocket::BoundState;
+    isLockedFile = lockSocket->state() != QUdpSocket::BoundState;
 }
 
 JulyLockFile::~JulyLockFile()
 {
-    if(lockFile->isOpen()||lockSocket->state()==QUdpSocket::BoundState)
-	{
-    lockFile->close();
-    lockFile->remove(lockFilePath);
-	}
-    if(lockFile)delete lockFile;
-    if(lockSocket)delete lockSocket;
+    free();
+}
+
+void JulyLockFile::free()
+{
+    if (lockFile)
+    {
+        if (lockFile->isOpen() || lockSocket->state() == QUdpSocket::BoundState)
+        {
+            lockFile->close();
+            lockFile->remove(lockFilePath);
+        }
+
+        delete lockFile;
+        lockFile = nullptr;
+    }
+
+    if (lockSocket)
+    {
+        delete lockSocket;
+        lockSocket = nullptr;
+    }
 }
 
 void JulyLockFile::updateLockFile()
 {
-    if(lockFile->open(QIODevice::WriteOnly))
+    if (lockFile->open(QIODevice::WriteOnly))
     {
         lockFile->write(QByteArray::number(lockPort));
         lockFile->close();
     }
-    else lockSocket->close();
+    else
+        lockSocket->close();
 }
 
 bool JulyLockFile::isLocked()

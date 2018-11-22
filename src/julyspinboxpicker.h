@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -38,32 +38,32 @@ class QMouseEvent;
 
 class JulySpinBoxPicker : public QLabel
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	JulySpinBoxPicker(QDoubleSpinBox *parent, double *forceMinimumValue=0, double internalMinimumValue=0);
-	~JulySpinBoxPicker();
+    JulySpinBoxPicker(QDoubleSpinBox* parent, double* forceMinimumValue = 0, double internalMinimumValue = 0);
+    ~JulySpinBoxPicker();
 
 private:
-	double *forceMinimumValue;
-	double internalMinimumValue;
-	double maximumValue;
-	int scrollDirection;
-	void setIcon(int);
-	double minimumValue;
-	bool j_debugMode;
-	QRect currentScreenRect;
-	QPoint j_cursorLastPos;
-	QPoint j_cursorLastMove;
-	bool j_isPressing;
-	QPixmap j_simpleState;
-	QPixmap j_pressedState;
-	QPixmap j_disabledState;
+    double* forceMinimumValue;
+    double internalMinimumValue;
+    double maximumValue;
+    int scrollDirection;
+    void setIcon(int);
+    double minimumValue;
+    bool j_debugMode;
+    QRect currentScreenRect;
+    QPoint j_cursorLastPos;
+    QPoint j_cursorLastMove;
+    bool j_isPressing;
+    QPixmap j_simpleState;
+    QPixmap j_pressedState;
+    QPixmap j_disabledState;
 
-	void mouseMoveEvent(QMouseEvent *event);
-	void mousePressEvent(QMouseEvent *event);
-	void mouseReleaseEvent(QMouseEvent *event);
-	QDoubleSpinBox *parentSpinBox;
+    void mouseMoveEvent(QMouseEvent* event);
+    void mousePressEvent(QMouseEvent* event);
+    void mouseReleaseEvent(QMouseEvent* event);
+    QDoubleSpinBox* parentSpinBox;
 };
 
 #endif // JULYSPINBOXPICKER_H

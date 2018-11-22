@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -38,42 +38,43 @@
 
 class HistoryModel : public QAbstractItemModel
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	HistoryModel();
-	~HistoryModel();
+    HistoryModel();
+    ~HistoryModel();
     double getRowPrice(int);
     double getRowVolume(int);
-	int getRowType(int);
-	void clear();
+    int getRowType(int);
+    void clear();
+    void loadLastPrice();
 
-	void historyChanged(QList<HistoryItem> *histList);
+    void historyChanged(QList<HistoryItem>* histList);
 
-	void setHorizontalHeaderLabels(QStringList list);
+    void setHorizontalHeaderLabels(QStringList list);
 
-	QModelIndex index(int row, int column, const QModelIndex &parent=QModelIndex()) const;
-	QModelIndex parent(const QModelIndex &index) const;
+    QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const;
+    QModelIndex parent(const QModelIndex& index) const;
 
-	QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-	Qt::ItemFlags flags(const QModelIndex &index) const;
-	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
+    Qt::ItemFlags flags(const QModelIndex& index) const;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
-	int rowCount(const QModelIndex &parent = QModelIndex()) const;
-	int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    int rowCount(const QModelIndex& parent = QModelIndex()) const;
+    int columnCount(const QModelIndex& parent = QModelIndex()) const;
 private:
-	int dateWidth;
-	int typeWidth;
-	quint32 lastDate;
-	int columnsCount;
-	QStringList headerLabels;
-	QStringList typesLabels;
+    int dateWidth = 0;
+    int typeWidth = 0;
+    quint32 lastDate;
+    int columnsCount;
+    QStringList headerLabels;
+    QStringList typesLabels;
 
-	QList<HistoryItem> itemsList;
-	//typesList; 0=General, 1=Buy, 2=Sell, 3=Widthdraw, 4=Found
+    QList<HistoryItem> itemsList;
+    //typesList; 0=General, 1=Buy, 2=Sell, 3=Widthdraw, 4=Found
 signals:
-    void accLastSellChanged(QString,double);
-    void accLastBuyChanged(QString,double);
+    void accLastSellChanged(QString, double);
+    void accLastBuyChanged(QString, double);
 };
 
 #endif // HISTORYMODEL_H

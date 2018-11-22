@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -40,27 +40,27 @@
 
 class TranslationDialog : public QDialog
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	TranslationDialog(QWidget *parent = 0);
-	~TranslationDialog();
+    explicit TranslationDialog(QWidget* parent = 0);
+    ~TranslationDialog();
 
 private:
-	void resizeEvent(QResizeEvent *event);
-	QGridLayout *gridLayout;
-	TranslationLine *authorAbout;
-	void fillLayoutByMap(QMap<QString,QString>*, QString subName, QMap<QString,QString>* dMap);
-	QList<TranslationLine*> lineEdits;
-	QWidget fonWidget;
-	Ui::TranslationDialog ui;
+    void resizeEvent(QResizeEvent* event);
+    QGridLayout* gridLayout;
+    TranslationLine* authorAbout;
+    void fillLayoutByMap(QMap<QString, QString>*, QString subName, QMap<QString, QString>* dMap);
+    QList<TranslationLine*> lineEdits;
+    QWidget fonWidget;
+    Ui::TranslationDialog ui;
 public slots:
-	void deleteTranslationButton();
-	void lineTextChanged();
-	void fixLayout();
-	void searchLang(QString);
-	void applyButton();
-	void saveAsButton();
+    void deleteTranslationButton();
+    void lineTextChanged();
+    void fixLayout();
+    void searchLang(QString);
+    void applyButton();
+    void saveAsButton();
 };
 
 #endif // TRANSLATIONDIALOG_H

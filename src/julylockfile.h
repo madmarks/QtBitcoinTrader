@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -42,16 +42,17 @@ class JulyLockFile : public QObject
     Q_OBJECT
 
 public:
-	bool isLocked();
-	JulyLockFile(QString imageName);
-	~JulyLockFile();
+    bool isLocked();
+    explicit JulyLockFile(QString imageName, QString tempDir = "");
+    ~JulyLockFile();
+    void free();
 
 private:
     quint16 lockPort;
     QString lockFilePath;
-	bool isLockedFile;
-	QFile *lockFile;
-	QUdpSocket *lockSocket;
+    bool isLockedFile;
+    QFile* lockFile;
+    QUdpSocket* lockSocket;
 private slots:
     void updateLockFile();
 };

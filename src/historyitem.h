@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -37,31 +37,31 @@
 class HistoryItem
 {
 public:
-	HistoryItem();
+    HistoryItem();
 
-	bool displayFullDate;
-	quint32 dateTimeInt;
-	quint32 dateInt;
-	QString dateTimeStr;
-	QString timeStr;
-	QString description;
+    bool displayFullDate;
+    qint64  dateTimeInt;
+    quint32 dateInt;
+    QString dateTimeStr;
+    QString timeStr;
+    QString description;
 
     double volume;
-	QString volumeStr;
+    QString volumeStr;
 
     double price;
-	QString priceStr;
+    QString priceStr;
 
     double total;
-	QString totalStr;
+    QString totalStr;
 
     QString symbol;
 
-	int type; //0=General, 1=Sell, 2=Buy, 3=Fee, 4=Deposit, 5=Withdraw
+    int type; //0=General, 1=Sell, 2=Buy, 3=Fee, 4=Deposit, 5=Withdraw
 
-	void cacheStrings();
+    void cacheStrings();
 
-	bool isValid();
+    bool isValid();
 };
 
 #endif // HISTORYITEM_H

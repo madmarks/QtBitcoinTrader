@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -36,20 +36,23 @@
 
 struct CurrencyPairItem
 {
-	CurrencyPairItem();
+    CurrencyPairItem();
 
-	void setSymbol(QByteArray symb);
+    void setSymbol(QByteArray symb);
 
-	QString currAName;
-	QString name;
+    QString currAName;
+    QString name;
 
-	CurencyInfo currAInfo;
-	CurencyInfo currBInfo;
+    CurrencyInfo currAInfo;
+    CurrencyInfo currBInfo;
 
     QString symbol;
-    QString symbolSecond() const {return symbol+currRequestSecond;}
-	QByteArray currRequestPair;
-	QByteArray currRequestSecond;
+    QString symbolSecond() const
+    {
+        return symbol + currRequestSecond;
+    }
+    QByteArray currRequestPair;
+    QByteArray currRequestSecond;
 
     QString currAStr;
     QString currAStrLow;
@@ -63,12 +66,13 @@ struct CurrencyPairItem
     //double priceMax;
     double tradePriceMin;
     double tradeVolumeMin;
+    double tradeTotalMin;
 
-	int priceDecimals;
-	int currADecimals;
-	int currBDecimals;
-	int currABalanceDecimals;
-	int currBBalanceDecimals;
+    int priceDecimals;
+    int currADecimals;
+    int currBDecimals;
+    int currABalanceDecimals;
+    int currBBalanceDecimals;
 };
 
 #endif // CURRENCYPAIRITEM_H

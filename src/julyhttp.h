@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -37,96 +37,117 @@
 #include <QTime>
 #include <QNetworkCookie>
 
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+
+class QTimer;
+
 struct PacketItem
 {
-	QByteArray *data;
-	int reqType;
-	int retryCount;
-	bool skipOnce;
+    QByteArray* data = nullptr;
+    int reqType = 0;
+    int retryCount = 0;
+    bool skipOnce = false;
 };
 
 class JulyHttp : public QSslSocket
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
     bool noReconnect;
-	uint getCurrentPacketContentLength(){return contentLength;}
-	void clearPendingData();
-	void reConnect(bool mastAbort=true);
-	bool isReqTypePending(int);
-	void sendData(int reqType, const QByteArray &method, QByteArray postData=0, const QByteArray &restSignLine=0, const int &forceRetryCount=-1);
+    bool destroyClass;
+    bool ignoreError;
+    QTimer* secondTimer;
+    uint getCurrentPacketContentLength() const
+    {
+        return contentLength;
+    }
+    void clearPendingData();
+    void reConnect(bool forceAbort = true);
+    bool isReqTypePending(int);
+    void sendData(int reqType, const QByteArray& method, QByteArray postData = nullptr, const QByteArray& restSignLine = nullptr,
+                  const int& forceRetryCount = -1);
 
-	void prepareData(int reqType, const QByteArray &method, QByteArray postData=0, const QByteArray &restSignLine=0, const int &forceRetryCount=-1);
-	void prepareDataSend();
-	void prepareDataClear();
+    void prepareData(int reqType, const QByteArray& method, QByteArray postData = nullptr, const QByteArray& restSignLine = nullptr,
+                     const int& forceRetryCount = -1);
+    void prepareDataSend();
+    void prepareDataClear();
 
-	JulyHttp(const QString &hostName, const QByteArray &restKeyLine, QObject *parent, const bool &secure=true, const bool &keepAlive=true, const QByteArray &contentType="application/x-www-form-urlencoded");
-	~JulyHttp();
+    JulyHttp(const QString& hostName, const QByteArray& restKeyLine, QObject* parent, const bool& secure = true,
+             const bool& keepAlive = true, const QByteArray& contentType = "application/x-www-form-urlencoded");
+    ~JulyHttp();
 
-    void setPortForced(quint16 port){forcedPort=port;}
+    void setPortForced(quint16 port)
+    {
+        forcedPort = port;
+    }
+
+    static bool requestWait(const QUrl& url, QByteArray& result, QString* errorString = nullptr);
 private:
     quint16 forcedPort;
     QByteArray outBuffer;
     QByteArray contentTypeLine;
-	int noReconnectCount;
-	void addSpeedSize(qint64);
-	QMap<QByteArray,QByteArray> cookiesMap;
-	void saveCookies();
-	int apiDownCounter;
-	bool secureConnection;
-	bool isDataPending;
-	void uncompress(QByteArray *data);
-	bool contentGzipped;
-	QByteArray *currentPendingRequest;
-	bool connectionClose;
-	int httpState;
-	qint64 bytesDone;
-	uint contentLength;
-	bool waitingReplay;
-	bool readingHeader;
-	qint64 chunkedSize;
+    int noReconnectCount;
+    void addSpeedSize(qint64);
+    QMap<QByteArray, QByteArray> cookiesMap;
+    void saveCookies();
+    int apiDownCounter;
+    bool secureConnection;
+    bool isDataPending;
+    void gzipUncompress(QByteArray* data);
+    bool contentGzipped;
+    QByteArray* currentPendingRequest;
+    bool connectionClose;
+    int httpState;
+    qint64 bytesDone;
+    uint contentLength;
+    bool waitingReplay;
+    bool readingHeader;
+    qint64 chunkedSize;
 
-	void abortSocket();
-	bool isDisabled;
-	QByteArray cookieLine;
-	int outGoingPacketsCount;
-	void setupSocket();
-	bool isSocketConnected();
-	void reconnectSocket(bool mastAbort);
-	void setApiDown(bool);
-	bool apiDownState;
-	bool packetIsChunked;
-	QByteArray buffer;
-	bool nextPacketMastBeSize;
-	bool endOfPacket;
-	void clearRequest();
-	void retryRequest();
+    void abortSocket();
+    bool isDisabled;
+    QByteArray cookieLine;
+    int outGoingPacketsCount;
+    void setupSocket();
+    bool isSocketConnected();
+    void reconnectSocket(bool forceAbort);
+    void setApiDown(bool);
+    bool apiDownState;
+    bool packetIsChunked;
+    QByteArray buffer;
+    bool nextPacketMustBeSize;
+    bool endOfPacket;
+    void clearRequest();
+    void retryRequest();
 
-	QTime requestTimeOut;
-	QList<PacketItem>requestList;
-	QMap<int,int> reqTypePending;
+    QTime requestTimeOut;
+    QList<PacketItem>requestList;
+    QMap<int, int> reqTypePending;
 
-	QList<PacketItem>preparedList;
+    QList<PacketItem>preparedList;
 
-	void takeFirstRequest();
-	void takeRequestAt(int);
-	QByteArray restKeyLine;
-	QByteArray httpHeader;
-	QString hostName;
+    void takeFirstRequest();
+    void takeRequestAt(int);
+    QByteArray restKeyLine;
+    QByteArray httpHeader;
+    QString hostName;
+
 private slots:
-	void sslErrorsSlot(const QList<QSslError> &);
-	void errorSlot(QAbstractSocket::SocketError);
-	void sendPendingData();
-	void readSocket();
+    void sslErrorsSlot(const QList<QSslError>&);
+    void errorSlot(QAbstractSocket::SocketError);
+    void sendPendingData();
+    void readSocket();
+
 signals:
-	void setDataPending(bool);
-	void dataProgress(int);
-	void anyDataReceived();
-	void errorSignal(QString);
-	void sslErrorSignal(const QList<QSslError> &);
-	void apiDown(bool);
-	void dataReceived(QByteArray,int);
+    void setDataPending(bool);
+    void dataProgress(int);
+    void anyDataReceived();
+    void errorSignal(QString);
+    void sslErrorSignal(const QList<QSslError>&);
+    void apiDown(bool);
+    void dataReceived(QByteArray, int);
 };
 
 #endif // JULYHTTP_H

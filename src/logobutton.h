@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -39,19 +39,20 @@
 
 class LogoButton : public QWidget
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	LogoButton(QWidget *parent = 0);
-	~LogoButton();
+    explicit LogoButton(bool isCentrabit, QWidget* parent = nullptr);
+    ~LogoButton();
+    void setImage(QString image);
 
 private:
-	QSize logoSize;
-	void resizeEvent(QResizeEvent *);
-	void mouseReleaseEvent(QMouseEvent *event);
-	Ui::LogoButton ui;
+    QSize logoSize;
+    void resizeEvent(QResizeEvent*);
+    void mouseReleaseEvent(QMouseEvent* event);
+    Ui::LogoButton ui;
 public slots:
-	void themeChanged();
+    void themeChanged();
 };
 
 #endif // LOGOBUTTON_H

@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -32,8 +32,11 @@
 #ifndef TIMESYNC_H
 #define TIMESYNC_H
 
-#include <QThread>
-#include <QTimer>
+#include <QObject>
+#include <QMutex>
+
+class QThread;
+class QElapsedTimer;
 
 class TimeSync : public QObject
 {
@@ -42,23 +45,26 @@ class TimeSync : public QObject
 public:
     TimeSync();
     ~TimeSync();
-
     static TimeSync* global();
-    static quint32 getTimeT();
+    static qint64 getTimeT();
+    static void syncNow();
 
-private:
-    QThread *dateUpdateThread;
-    QTimer *dateUpdateTimer;
-    QAtomicInt timeShift;
+signals:
+    void warningMessage(QString);
+    void startSync();
 
 private slots:
     void runThread();
     void getNTPTime();
-
-signals:
-    void stopTimer();
-    void deleteTimer();
-    void finishThread();
+    void quitThread();
+private:
+    QScopedPointer<QThread> dateUpdateThread;
+    std::atomic<qint64> started;
+    qint64 startTime;
+    std::atomic<qint64> timeShift;
+    QScopedPointer<QElapsedTimer> additionalTimer;
+    QMutex mutex;
+    int getNTPTimeRetryCount;
 };
 
 #endif // TIMESYNC_H

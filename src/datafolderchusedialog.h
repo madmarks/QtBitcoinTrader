@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -37,17 +37,17 @@
 
 class DataFolderChuseDialog : public QDialog
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	bool isPortable;
-	DataFolderChuseDialog(QString systemPath, QString localPath);
-	~DataFolderChuseDialog();
+    bool isPortable;
+    DataFolderChuseDialog(QString systemPath, QString localPath);
+    ~DataFolderChuseDialog();
 
 private:
-	Ui::DataFolderChuseDialog ui;
+    Ui::DataFolderChuseDialog ui;
 private slots:
-	void on_buttonUsePortableMode_clicked();
+    void on_buttonUsePortableMode_clicked();
 };
 
 #endif // DATAFOLDERCHUSEDIALOG_H

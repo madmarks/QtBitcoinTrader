@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -34,7 +34,6 @@
 #include <QObject>
 #include <QDockWidget>
 
-
 class QDockWidget;
 
 
@@ -43,13 +42,14 @@ class DockHost : public QObject
     Q_OBJECT
 
 public:
-    DockHost(QObject* parent = NULL);
+    explicit DockHost(QObject*);
     ~DockHost();
 
 public:
     QDockWidget* createDock(QWidget* parent, QWidget* widget, const QString& title);
     void lockDocks(bool lock);
     void setFloatingVisible(bool visible);
+    void closeFloatingWindow();
 
 protected:
     bool eventFilter(QObject* obj, QEvent* event) Q_DECL_OVERRIDE;
@@ -66,6 +66,6 @@ private:
     bool isConstrained(QDockWidget* dock);
 
 private:
-    QList<QWidget*>     widgets;
-    QDockWidget*        dockToggling;
+    QList<QWidget*> widgets;
+    QDockWidget*    dockToggling;
 };

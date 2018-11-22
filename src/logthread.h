@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -36,22 +36,25 @@
 
 class LogThread : public QThread
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	void writeLog(QByteArray,int debugLevel=0);
-    void writeLogB(QString mess,int dLevel=0){writeLog(mess.toLatin1(),dLevel);}
-	LogThread(bool writeFile=true);
-	~LogThread();
+    void writeLog(QByteArray, int debugLevel = 0);
+    void writeLogB(QString mess, int dLevel = 0)
+    {
+        writeLog(mess.toLatin1(), dLevel);
+    }
+    explicit LogThread(bool writeFile = true);
+    ~LogThread();
 
 private:
-	bool writeFile;
-	void run();
+    bool writeFile;
+    void run();
 signals:
-	void writeLogSignal(QByteArray,int);
-	void sendLogSignal(QByteArray);
+    void writeLogSignal(QByteArray, int);
+    void sendLogSignal(QByteArray);
 public slots:
-	void writeLogSlot(QByteArray,int);
+    void writeLogSlot(QByteArray, int);
 };
 
 #endif // LOGTHREAD_H

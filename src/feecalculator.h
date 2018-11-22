@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -37,33 +37,44 @@
 
 class FeeCalculator : public QDialog
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	FeeCalculator();
-	~FeeCalculator();
+    FeeCalculator();
+    ~FeeCalculator();
+
+public slots:
+    void languageChanged();
+
+private slots:
+    void on_singleInstance_toggled(bool);
+    void setStaysOnTop(bool);
+    void setZeroProfitPrice();
+    void profitLossChanged(double);
+    void buyBtcChanged(double);
+    void buyPriceChanged(double);
+    void buyTotalPaidChanged(double);
+    void buyBtcReceivedChanged(double);
+    void sellPriceChanged(double);
+    void feeChanged(double);
 
 private:
-	bool buyPaidLocked;
-	bool buyBtcReceivedLocked;
-	bool buyBtcLocked;
-	Ui::FeeCalculator ui;
-public slots:
-	void languageChanged();
-private slots:
-	void on_singleInstance_toggled(bool);
-	void setStaysOnTop(bool);
-	void setZeroProfitPrice();
-	void profitLossChanged(double);
-	void buyBtcChanged(double);
-	void buyPriceChanged(double);
-	void buyTotalPaidChanged(double);
-	void buyBtcReceivedChanged(double);
-	void sellPriceChanged(double);
-	void sellAmountChanged(double);
-    void sellFiatReceived(double);
-	void feeChanged(double);
+    double buy;
+    double buyPrice;
+    double buySum;
+    double buyFee;
+    double buyRez;
+    double sell;
+    double sellPrice;
+    double sellSum;
+    double sellFee;
+    double sellRez;
+    double fee;
+    bool locked;
+    Ui::FeeCalculator ui;
 
+    void buyCalc();
+    void sellCalc();
 };
 
 #endif // FEECALCULATOR_H

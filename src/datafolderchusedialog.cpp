@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -31,18 +31,37 @@
 
 #include "datafolderchusedialog.h"
 #include "main.h"
+#include <QStandardPaths>
 
 DataFolderChuseDialog::DataFolderChuseDialog(QString systemPath, QString localPath)
-	: QDialog()
+    : QDialog()
 {
-	isPortable=false;
-	ui.setupUi(this);
-	setWindowFlags(Qt::WindowCloseButtonHint);
-	ui.buttonUseSystemFolder->setText(julyTr("USE_SYSTEM_FOLDER","Store your data in system folder."));
-	ui.buttonUseSystemFolder->setToolTip(systemPath.replace("/","\\"));
-	ui.buttonUsePortableMode->setText(julyTr("USE_PORTABLE_MODE","Enable portable mode. Store your data in same folder as executable file."));
-	ui.buttonUsePortableMode->setToolTip(localPath.replace("/","\\"));
-	setFixedSize(minimumSizeHint().width()+40,qMax(minimumSizeHint().height(),150));
+    isPortable = false;
+    ui.setupUi(this);
+    setWindowFlags(Qt::WindowCloseButtonHint);
+
+
+#ifdef Q_OS_WIN
+    systemPath.replace('/', '\\');
+    localPath.replace('/', '\\');
+#else
+
+    QString homeDir = QStandardPaths::standardLocations(QStandardPaths::HomeLocation).first();
+
+    if (systemPath.startsWith(homeDir))
+    {
+        systemPath.remove(0, homeDir.size());
+        systemPath.prepend("~");
+    }
+
+#endif
+
+    ui.buttonUseSystemFolder->setText(julyTr("USE_SYSTEM_FOLDER", "Store your data in system folder") + "\n\n" + systemPath);
+    ui.buttonUsePortableMode->setToolTip(systemPath);
+    ui.buttonUsePortableMode->setText(julyTr("USE_PORTABLE_MODE",
+                                      "Enable portable mode. Store your data in same folder as executable file"));
+    ui.buttonUsePortableMode->setToolTip(localPath);
+    setFixedSize(minimumSizeHint().width() + 40, qMax(minimumSizeHint().height(), 150));
 }
 
 DataFolderChuseDialog::~DataFolderChuseDialog()
@@ -52,6 +71,6 @@ DataFolderChuseDialog::~DataFolderChuseDialog()
 
 void DataFolderChuseDialog::on_buttonUsePortableMode_clicked()
 {
-	isPortable=true;
-	accept();
+    isPortable = true;
+    accept();
 }

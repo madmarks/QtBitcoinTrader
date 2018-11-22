@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -39,30 +39,30 @@
 
 struct AppTheme
 {
-	AppTheme();
-	void loadTheme(QString);
-	QString styleSheet;
-	QColor getColor(QString);
-	QPalette palette;
-	QColor swapColor(QColor color);
-	QColor altRowColor;
-	QColor gray;
-	QColor lightGray;
-	QColor red;
-	QColor green;
-	QColor blue;
-	QColor lightRed;
-	QColor lightGreen;
-	QColor lightBlue;
-	QColor darkRed;
-	QColor darkGreen;
-	QColor darkBlue;
-	QColor lightRedGreen;
-	QColor lightGreenBlue;
-	QColor lightRedBlue;
-	QColor darkRedBlue;
-	QColor black;
-	QColor white;
+    AppTheme();
+    void loadTheme(const QString&);
+    QString styleSheet;
+    QColor getColor(const QString&) const;
+    QPalette palette;
+    QColor swapColor(const QColor& color);
+    QColor altRowColor;
+    QColor gray;
+    QColor lightGray;
+    QColor red;
+    QColor green;
+    QColor blue;
+    QColor lightRed;
+    QColor lightGreen;
+    QColor lightBlue;
+    QColor darkRed;
+    QColor darkGreen;
+    QColor darkBlue;
+    QColor lightRedGreen;
+    QColor lightGreenBlue;
+    QColor lightRedBlue;
+    QColor darkRedBlue;
+    QColor black;
+    QColor white;
 };
 
 #endif // APPTHEME_H

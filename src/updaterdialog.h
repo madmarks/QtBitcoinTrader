@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -39,32 +39,37 @@
 
 class UpdaterDialog : public QDialog
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	UpdaterDialog(bool feedbackMessage);
-	~UpdaterDialog();
+    explicit UpdaterDialog(bool feedbackMessage);
+    ~UpdaterDialog();
 
 private:
-	QByteArray getMidData(QString a, QString b,QByteArray *data);
-	bool downloaded100;
-	bool feedbackMessage;
-	QTimer *timeOutTimer;
-	void downloadError(int);
-	QString updateVersion;
-	QByteArray updateSignature;
-	QString updateChangeLog;
-	QString updateLink;
-	
-	int stateUpdate;
-	JulyHttp *httpGet;
-	Ui::UpdaterDialog ui;
+    bool forceUpdate;
+    QByteArray getMidData(QString a, QString b, QByteArray* data);
+    bool downloaded100;
+    bool feedbackMessage;
+    QTimer* timeOutTimer;
+    void downloadError(int);
+    void downloadErrorFile(int);
+    QString updateVersion;
+    QByteArray updateSignature;
+    QByteArray versionSignature;
+    QString updateChangeLog;
+    QString updateLink;
+
+    int stateUpdate;
+    bool autoUpdate;
+    JulyHttp* httpGet;
+    JulyHttp* httpGetFile;
+    Ui::UpdaterDialog ui;
 private slots:
-	void invalidData(bool);
-	void dataReceived(QByteArray,int);
-	void exitSlot();
-	void dataProgress(int);
-	void buttonUpdate();
+    void invalidData(bool);
+    void dataReceived(QByteArray, int);
+    void exitSlot();
+    void dataProgress(int);
+    void buttonUpdate();
 };
 
 #endif // UPDATERDIALOG_H

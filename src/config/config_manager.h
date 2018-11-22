@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ class QSettings;
 
 
 class ConfigManager :
-        public QObject
+    public QObject
 {
     Q_OBJECT
 
@@ -55,6 +55,7 @@ public:
     void load(const QString& name);
     void remove(const QString& name);
     void translateDefaultNames();
+    void restoreState();
 
     QStringList       defaultNames;
     QStringList       defaultNamesTr;
@@ -66,8 +67,11 @@ Q_SIGNALS:
     void onChanged();
 
 private:
-    QSettings                settings;
-    QHash<QString,QVariant> settingsCache;
+    QSettings               settings;
+    QHash<QString, QVariant> settingsCache;
+    QByteArray lastRestoreState;
+    QByteArray lastRestoreGeometry;
+    quint32 lastRestoreTime;
 };
 
 extern ConfigManager* config;

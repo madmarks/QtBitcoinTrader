@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -38,48 +38,55 @@
 
 class OrdersModel : public QAbstractItemModel
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
     int getAsksCount();
-	int getRowNum(int row);
-	QByteArray getRowOid(int row);
-	quint32 getRowDate(int row);
-	int getRowType(int row);
-	int getRowStatus(int row);
+    int getRowNum(int row);
+    QByteArray getRowOid(int row);
+    quint32 getRowDate(int row);
+    int getRowType(int row);
+    int getRowStatus(int row);
     double getRowPrice(int row);
     double getRowVolume(int row);
     double getRowTotal(int row);
 
-    QMap<double,bool> currentAsksPrices;
-    QMap<double,bool> currentBidsPrices;
+    QMap<double, bool> currentAsksPrices;
+    QMap<double, bool> currentBidsPrices;
 
-	bool checkDuplicatedOID;
-    void ordersCancelAll(QString pair=0);
-    void ordersCancelBids(QString pair=0);
-    void ordersCancelAsks(QString pair=0);
-	void setOrderCanceled(QByteArray);
+    bool checkDuplicatedOID;
+    void ordersCancelAll(QString pair = 0);
+    void ordersCancelBids(QString pair = 0);
+    void ordersCancelAsks(QString pair = 0);
+    void setOrderCanceled(QByteArray);
 
-	void clear();
+    void filterSymbolChanged(QString filterSymbol = "");
 
-	OrdersModel();
-	~OrdersModel();
+    void clear();
 
-	void orderBookChanged(QList<OrderItem> *ordersRcv);
+    OrdersModel();
+    ~OrdersModel();
 
-	void setHorizontalHeaderLabels(QStringList list);
+    void orderBookChanged(QList<OrderItem>* ordersRcv);
 
-	QModelIndex index(int row, int column, const QModelIndex &parent=QModelIndex()) const;
-	QModelIndex parent(const QModelIndex &index) const;
+    void setHorizontalHeaderLabels(QStringList list);
 
-	QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-	Qt::ItemFlags flags(const QModelIndex &index) const;
-	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const;
+    QModelIndex parent(const QModelIndex& index) const;
 
-	int rowCount(const QModelIndex &parent = QModelIndex()) const;
-	int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
+    Qt::ItemFlags flags(const QModelIndex& index) const;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
-	QList<OrderItem> orders;
+    int rowCount(const QModelIndex& parent = QModelIndex()) const;
+    int columnCount(const QModelIndex& parent = QModelIndex()) const;
+
+    QList<OrderItem> orders;
+
+signals:
+    void cancelOrder(QString, QByteArray);
+    void ordersIsAvailable();
+    void volumeAmountChanged(double, double);
 
 private:
     void ordersCountChanged();
@@ -92,45 +99,40 @@ private:
 
     int asksCount;
 
-	QHash<QByteArray,quint32> oidMapForCheckingDuplicates;
-	QStringList textStatusList;
-	QString textAsk;
-	QString textBid;
+    QHash<QByteArray, quint32> oidMapForCheckingDuplicates;
+    QStringList textStatusList;
+    QString textAsk;
+    QString textBid;
 
-	bool haveOrders;
+    bool haveOrders;
 
-	int countWidth;
-	int columnsCount;
-	int dateWidth;
-	int typeWidth;
-	int statusWidth;
+    int countWidth;
+    int columnsCount;
+    int dateWidth;
+    int typeWidth;
+    int statusWidth;
 
-	QStringList headerLabels;
+    QStringList headerLabels;
 
-	QList<QByteArray> oidList;
+    QList<QByteArray> oidList;
 
-	QList<quint32> dateList;
-	QStringList dateStrList;
+    QList<quint32> dateList;
+    QStringList dateStrList;
 
-	QList<bool> typesList;
+    QList<bool> typesList;
 
-	QList<int> statusList;
+    QList<int> statusList;
 
     QList<double> amountList;
-	QStringList amountStrList;
+    QStringList amountStrList;
 
     QList<double> priceList;
-	QStringList priceStrList;
+    QStringList priceStrList;
 
     QList<double> totalList;
-	QStringList totalStrList;
+    QStringList totalStrList;
 
-	QStringList symbolList;
-
-signals:
-	void cancelOrder(QString, QByteArray);
-	void ordersIsAvailable();
-    void volumeAmountChanged(double, double);
+    QStringList symbolList;
 };
 
 #endif // ORDERSMODEL_H

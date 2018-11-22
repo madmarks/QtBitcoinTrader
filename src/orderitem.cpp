@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -32,30 +32,55 @@
 #include "orderitem.h"
 #include "main.h"
 #include "julymath.h"
+#include "iniengine.h"
 
 bool OrderItem::isValid()
 {
-	bool isVal=date>0&&price>0.0&&symbol.size()==6;
-	if(isVal)
-	{
-        QDateTime itemDate=QDateTime::fromTime_t(date);
-        if(baseValues_->use24HourTimeFormat){
-            dateStr=itemDate.toString(baseValues.dateTimeFormat);
-        } else {
-            QString mmssTemp=itemDate.toString("mm:ss");
-            QString hTemp=itemDate.toString("H");
-            qint16 hTempInt=hTemp.toInt();
+    bool isVal = date > 0 && price > 0.0 && symbol.size() >= 5;
+
+    if (isVal)
+    {
+        QDateTime itemDate = QDateTime::fromTime_t(date);
+
+        if (baseValues_->use24HourTimeFormat)
+        {
+            dateStr = itemDate.toString(baseValues.dateTimeFormat);
+        }
+        else
+        {
+            QString mmssTemp = itemDate.toString("mm:ss");
+            QString hTemp = itemDate.toString("H");
+            qint16 hTempInt = hTemp.toShort();
             QString timeStr;
-            if(hTempInt<=12)timeStr=hTemp+':'+mmssTemp+" am";
-            else timeStr=QString::number(hTempInt-12)+':'+mmssTemp+" pm";
-            dateStr=itemDate.toString("dd.MM.yyyy")+' '+timeStr;
+
+            if (hTempInt <= 12)
+                timeStr = hTemp + ':' + mmssTemp + " am";
+            else
+                timeStr = QString::number(hTempInt - 12) + ':' + mmssTemp + " pm";
+
+            dateStr = itemDate.toString("dd.MM.yyyy") + ' ' + timeStr;
         }
 
-		QString priceSign=baseValues.currencyMap.value(symbol.right(3),CurencyInfo("$")).sign;
-        amountStr=baseValues.currencyMap.value(symbol.left(3),CurencyInfo("$")).sign+textFromDouble(amount);
-        priceStr=priceSign+textFromDouble(price);
-		total=price*amount;
-        totalStr=priceSign+textFromDouble(total,baseValues.currentPair.currBDecimals);
-	}
-	return isVal;
+        QString currAStr, currBStr;
+        int posSplitter = symbol.indexOf('/');
+
+        if (posSplitter == -1)
+        {
+            currAStr = symbol.left(3);
+            currBStr = symbol.right(3);
+        }
+        else
+        {
+            currAStr = symbol.left(posSplitter);
+            currBStr = symbol.right(symbol.size() - posSplitter - 1);
+        }
+
+        QString priceSign = IniEngine::getCurrencyInfo(currBStr).sign;
+        amountStr = IniEngine::getCurrencyInfo(currAStr).sign + JulyMath::textFromDouble(amount);
+        priceStr = priceSign + JulyMath::textFromDouble(price);
+        total = price * amount;
+        totalStr = priceSign + JulyMath::textFromDouble(total, baseValues.currentPair.currBDecimals);
+    }
+
+    return isVal;
 }

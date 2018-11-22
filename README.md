@@ -5,8 +5,6 @@ This software helps you open and cancel orders very fast. Real time data monitor
 Developed on pure Qt, uses OpenSSL, AES 256 key and secret protection.
 
 I want to develop this Trader App so that it can be configured for any rule and strategy.
- 
-If you want to help me, than donate to `1d6iMwjjNo8ZGYeJBZKXgcgVk9o7fXcjc`
 
 Next ToDo:
 - Add realtime charts
@@ -14,17 +12,24 @@ Next ToDo:
 
 ## Official website
 
-* https://centrabit.com/?m0prm=6
+* https://centrabit.com/index.php?m0prm=6
+* https://qttrader.com
 
 ## Download binaries
 
-* https://sourceforge.net/projects/bitcointrader/  `Win32`,`Mac`
+* https://sourceforge.net/projects/bitcointrader/  `Win32`,`Mac`,`Linux`
 * http://www.softpedia.com/get/Others/Finances-Business/Bitcoin-Trader.shtml `Win32`
 * http://mac.softpedia.com/get/Finance/Qt-Bitcoin-Trader.shtml `Mac`
-* http://packages.gentoo.org/package/app-office/QtBitcoinTrader `Gentoo`
-* http://packages.altlinux.org/en/Sisyphus/srpms/QtBitcoinTrader `Alt Linux`
+
+## Compilation on Linux
+* `sudo apt-get install g++ libssl-dev libglu1-mesa-dev qt5-qmake qtscript5-dev qtmultimedia5-dev git`
+* `git clone https://github.com/JulyIGHOR/QtBitcoinTrader.git`
+* `cd ./QtBitcoinTrader/src`
+* `QT_SELECT=5 qmake QtBitcoinTrader_Desktop.pro`
+* `make && make install && make clean`
 
 ## Demos
+
 * http://www.youtube.com/watch?v=C--P258DQkk
 
 ## Forums
@@ -40,6 +45,110 @@ Next ToDo:
 * http://vk.com/QtBitcoinTrader `RUS`
 
 ## Change Log
+
+v1.40.23
+- Added new exchange Bittrex
+- Portable mode for Linux and macOS
+- Secure auto update for Linux x86_64
+- Uninstall option in help menu
+- Fixed Binance own trade history order
+- Time Sync bug fixed
+- HDPI bug fixed
+- Minor fixes
+
+v1.40.22
+- Added new exchange Binance
+- Many small fixes
+- Subscribe to beta of Qt Trader exchange www.QtTrader.com
+
+v1.40.21
+- Qt Trader 2.0 Announced! Visit www.QtTrader.com
+- Fixed bug of Rules dialog
+- Fixed HiDPI mode
+- Fixed Script and Rules enable-disable command
+- Fixed Last Buy and Sell price event bug
+- Memory optimisations, refractoring
+- Minor fixes
+
+v1.40.12
+- Dropped support of Windows XP and macOS 10.9, but you still can compile it manually
+- Removed update size limit for future bigger updates
+- Fixed Bitfinex trade history bug
+- Fixed Bitstamp certificate issue
+- Switched to OpenSSL 1.1, no UPX in release binaries
+- Minor improvements
+
+v1.40.09
+- Fixed FeeCalculator crash
+- Fixed account open orders filtering and calculations
+- UI layout bugs fixed
+
+v1.40.08
+- Added WEX exchange, removed BTC-e
+- Fixed crash on app closing
+- Added confirmation message on script editor clear
+- Minor fixes
+
+v1.40.07
+- Release builds for Win64
+- Fix balance for OKCoin
+- Fix script for Bitfinex
+- Fix order type for Bitfinex
+- JL Script logs now recognize endline and tabulation
+- Fixed bug when silent auto update wont work
+
+v1.40.06
+- Fixed fee calculator issue
+- Added new currencies
+- Minor improvements and fixes
+
+v1.40.03
+- Bitfinex support fixes
+- Secure auto update now works via Proxy
+- YoBit support fixes
+- Added button to force resync currencies
+
+v1.4
+- New Exchange YoBit.net
+- Currency pair synchronization on startup!
+- Fixed issue with functions getPriceByVolume and getVolumeByPrice in JL Script
+- Add HiDPI enable or disable settings
+- Now you can search for currency pairs by keyword
+- Improved many elements of interface
+- Fixed bug with certificate that caused error messages
+- Many other small fixes
+
+v1.30.04
+- Add new pair for BitStamp
+- Fixd fee calculations in Bitfinex
+- Main window title now shows middle price instead of last trade price
+- Fixed issue when app can't start
+
+v1.30.03
+- High screen resolution support for Windows
+- Fixed fee for BTCChina and OKCoin
+- Add new pairs for Bitfinex
+- Fixed authorization for Bitfinex
+- Completed the Norwegian translation
+- Fixed bug on restoring Workspace from previous state
+- Fixed account data and add new pairs for bitstamp
+- Fixed minor bugs
+
+v1.3
+- macOS Sierra support
+- JL Script file read/write support
+- Syncronised currency pairs of Bitfinex, Bitstamp, BTC-e
+- Fixed bugs of history and currency pair in Bitstamp
+- Improved Proxy settings
+- Fixed network stat information
+- Fixed display of balance in bitfinex, bitstamp, btcchina
+- Fix tonce in btcchina
+- Add reducing interface elements spacing (optional in settings)
+- Add inactive start script button
+- Fixed JL Script groups bug
+- Fixed open order/cancel bug in bitstamp
+- Fixed time synchronization bug
+
 
 v1.07.01
 - Hotfix. High CPU load fix. Nonce error fix

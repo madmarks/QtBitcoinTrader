@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -44,25 +44,27 @@ public:
     ~IndicatorEngine();
 
     static IndicatorEngine* global();
-    static void setValue(QString,QString,QString,double);
+    static void setValue(QString, QString, QString, double);
     static double getValue(QString);
 
 private:
     QMutex locker;
-    QHash<QByteArray,double> indicators;
+    QHash<QByteArray, double> indicators;
 
 private slots:
-    void setValueSlot(QString,QString,QString,double);
+    void setValueSlot(QString, QString, QString, double);
 
 signals:
-    void indicatorChanged(QString,QString,QString,double);
+    void indicatorChanged(QString, QString, QString, double);
 
-    void indicatorHighChanged(QString,double);
-    void indicatorLowChanged(QString,double);
-    void indicatorSellChanged(QString,double);
-    void indicatorBuyChanged(QString,double);
-    void indicatorLastChanged(QString,double);
-    void indicatorVolumeChanged(QString,double);
+    void indicatorHighChanged(QString, double);
+    void indicatorLowChanged(QString, double);
+    void indicatorSellChanged(QString, double);
+    void indicatorBuyChanged(QString, double);
+    void indicatorLastChanged(QString, double);
+    void indicatorVolumeChanged(QString, double);
+
+    void finishThread();
 };
 
 #endif // INDICATORENGINE_H

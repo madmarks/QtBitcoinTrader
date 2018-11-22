@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@
 #include <QString>
 
 class QWidget;
+class QObject;
 
 
 QString changeFileExt(const QString& fileName, const QString& ext);
@@ -41,3 +42,4 @@ QString adjustPathSeparators(const QString& path);
 QString slash(const QString& path1, const QString& path2);
 QString slash(const QString& path1, const QString& path2, const QString& path3);
 void adjustWidgetGeometry(QWidget* widget);
+void recursiveUpdateLayouts(const QObject* object);

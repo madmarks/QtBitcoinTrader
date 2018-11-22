@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -36,32 +36,32 @@
 
 struct TradesItem
 {
-	TradesItem();
-	bool backGray;
+    TradesItem();
+    bool backGray;
 
-	bool displayFullDate;
-	quint32 date;
-	QString dateStr;
-	QString timeStr;
+    bool displayFullDate;
+    qint64 date;
+    QString dateStr;
+    QString timeStr;
 
     double amount;
-	QString amountStr;
+    QString amountStr;
 
     double price;
-	QString priceStr;
+    QString priceStr;
 
     double total;
-	QString totalStr;
+    QString totalStr;
 
     QString symbol;//Like a "BTCUSD" 6 symbols only
 
-	int orderType;//-1:Bid; 0:None; 1:Ask
+    int orderType;//-1:Bid; 0:None; 1:Ask
 
-	int direction;//-1:Down; 0: None; 1:Up
+    int direction;//-1:Down; 0: None; 1:Up
 
-	void cacheStrings();
+    void cacheStrings();
 
-	bool isValid();
+    bool isValid();
 };
 
 #endif // TRADESITEM_H

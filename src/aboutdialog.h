@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -37,18 +37,18 @@
 
 class TranslationAbout : public QDialog
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	void showWindow();
-	TranslationAbout(QWidget *parent = 0);
-	~TranslationAbout();
+    void showWindow();
+    explicit TranslationAbout(QWidget* parent = 0);
+    ~TranslationAbout();
 
 private:
-	Ui::TranslationAbout ui;
+    Ui::TranslationAbout ui;
 private slots:
-	void createTranslation();
-	void buttonCheckUpdates();
+    void createTranslation();
+    void buttonCheckUpdates();
 };
 
 #endif // TRANSLATIONABOUT_H

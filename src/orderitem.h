@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -34,21 +34,21 @@
 #include <QByteArray>
 #include <QString>
 
-struct OrderItem 
+struct OrderItem
 {
-	QByteArray oid;
-	quint32 date;
-	QString dateStr;
-	bool type;//true=Ask, false=Bid
-	int status;//0=Canceled, 1=Open, 2=Pending, 3=Post-Pending
+    QByteArray oid;
+    qint64 date;
+    QString dateStr;
+    bool type;//true=Ask, false=Bid
+    int status;//0=Canceled, 1=Open, 2=Pending, 3=Post-Pending
     double amount;
-	QString amountStr;
+    QString amountStr;
     double price;
-	QString priceStr;
+    QString priceStr;
     double total;
-	QString totalStr;
+    QString totalStr;
     QString symbol;
-	bool isValid();
+    bool isValid();
 };
 
 #endif // ORDERITEM_H

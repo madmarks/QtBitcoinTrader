@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -38,276 +38,552 @@
 #include <QClipboard>
 #include <QDesktopServices>
 #include <QUrl>
+#include <QProcess>
 #include <QFile>
 #include "logobutton.h"
 #include "julymath.h"
 
+#ifdef Q_OS_WIN
+    #include "windows.h"
+#endif
+
 UpdaterDialog::UpdaterDialog(bool fbMess)
-	: QDialog()
+    : QDialog()
 {
-	QSettings settings(appDataDir+"/QtBitcoinTrader.cfg",QSettings::IniFormat);
-	int updateCheckRetryCount=settings.value("UpdateCheckRetryCount",0).toInt();
-	settings.setValue("UpdateCheckRetryCount",updateCheckRetryCount);
-	if(updateCheckRetryCount>10)
-	{
-		settings.setValue("UpdateCheckRetryCount",0);
-		updateCheckRetryCount=0;
-	}
-
-	downloaded100=false;
-	feedbackMessage=fbMess;
-	stateUpdate=0;
-	ui.setupUi(this);
-	setWindowFlags(Qt::WindowCloseButtonHint|Qt::WindowStaysOnTopHint);
-
-	Q_FOREACH(QGroupBox* groupBox, this->findChildren<QGroupBox*>())
-	{
-		if(groupBox->accessibleName()=="LOGOBUTTON")
-		{
-			QLayout *groupboxLayout=groupBox->layout();
-			if(groupboxLayout==0)
-			{
-				groupboxLayout=new QGridLayout;
-				groupboxLayout->setContentsMargins(0,0,0,0);
-				groupboxLayout->setSpacing(0);
-				groupBox->setLayout(groupboxLayout);
-                LogoButton *logoButton=new LogoButton;
-				groupboxLayout->addWidget(logoButton);
-			}
-		}
-	}
-
-    if(updateCheckRetryCount>3)httpGet=new JulyHttp("api.qtbitcointrader.com",0,this,false,false);
-    else httpGet=new JulyHttp("qbtapi.centrabit.com",0,this,false,false);
-    httpGet->noReconnect=true;
-	timeOutTimer=new QTimer(this);
-	connect(timeOutTimer,SIGNAL(timeout()),this,SLOT(exitSlot()));
-	connect(httpGet,SIGNAL(dataReceived(QByteArray,int)),this,SLOT(dataReceived(QByteArray,int)));
-	
-	QByteArray osString="Linux";
+    forceUpdate = false;
 
 #ifdef Q_OS_WIN
-	osString="Win";
+#ifndef QTBUILDTARGETWIN64
+
+    if (QSysInfo::windowsVersion() >  QSysInfo::WV_XP)
+    {
+        _SYSTEM_INFO sysinfo;
+        GetNativeSystemInfo(&sysinfo);
+
+        if (sysinfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64)
+            forceUpdate = true;
+    }
+
+#endif
 #endif
 
+    QSettings settings(appDataDir + "/QtBitcoinTrader.cfg", QSettings::IniFormat);
+    int updateCheckRetryCount = settings.value("UpdateCheckRetryCount", 0).toInt();
+    settings.setValue("UpdateCheckRetryCount", updateCheckRetryCount);
+
+    if (updateCheckRetryCount > 10)
+    {
+        settings.setValue("UpdateCheckRetryCount", 0);
+        updateCheckRetryCount = 0;
+    }
+
+    downloaded100 = false;
+    feedbackMessage = fbMess;
+    stateUpdate = 0;
+    autoUpdate = settings.value("AutoUpdate", false).toBool();
+    ui.setupUi(this);
+    ui.againAutoUpdateCheckBox->setChecked(autoUpdate);
+    setWindowFlags(Qt::WindowCloseButtonHint | Qt::WindowStaysOnTopHint);
+
+    Q_FOREACH (QGroupBox* groupBox, this->findChildren<QGroupBox*>())
+    {
+        if (groupBox->accessibleName() == "LOGOBUTTON")
+        {
+            QLayout* groupboxLayout = groupBox->layout();
+
+            if (groupboxLayout == nullptr)
+            {
+                groupboxLayout = new QGridLayout;
+                groupboxLayout->setContentsMargins(0, 0, 0, 0);
+                groupboxLayout->setSpacing(0);
+                groupBox->setLayout(groupboxLayout);
+                LogoButton* logoButton = new LogoButton(true);
+                groupboxLayout->addWidget(logoButton);
+            }
+        }
+    }
+
+    if (updateCheckRetryCount > 3)
+        httpGet = new JulyHttp("api.qtbitcointrader.com", nullptr, this, false, false);
+    else
+        httpGet = new JulyHttp("qbtapi.centrabit.com", nullptr, this, false, false);
+
+    httpGet->noReconnect = true;
+    timeOutTimer = new QTimer(this);
+    connect(timeOutTimer, SIGNAL(timeout()), this, SLOT(exitSlot()));
+    connect(httpGet, SIGNAL(dataReceived(QByteArray, int)), this, SLOT(dataReceived(QByteArray, int)));
+
+#ifdef Q_OS_WIN
+    QByteArray osString = "Win";
+
+    if (QSysInfo::windowsVersion() >  QSysInfo::WV_XP)
+    {
+        _SYSTEM_INFO sysinfo;
+        GetNativeSystemInfo(&sysinfo);
+
+        if (sysinfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64)
+            osString = "Win64";
+    }
+
+#else
 #ifdef Q_OS_MAC
-	osString="Mac";
+    QByteArray osString = "Mac";
+#else
+#ifdef Q_OS_LINUX
+#ifdef QTBUILDTARGETLINUX64
+    QByteArray osString = "Linux64";
+#else
+    QByteArray osString = "Linux";
+#endif
+#else
+    QByteArray osString = "Undefined";
+#endif
+#endif
 #endif
 
-	QByteArray reqStr="Beta=";
-	if(baseValues.appVerIsBeta)reqStr.append("true");
-	else reqStr.append("false");
+    QByteArray reqStr = "Beta=";
 
-    reqStr.append("&Version="+byteArrayFromDouble(baseValues.appVerReal*100000,0));
+    if (baseValues.appVerIsBeta)
+        reqStr.append("true");
+    else
+        reqStr.append("false");
 
-	reqStr.append("&OS="+osString);
-	reqStr.append("&Locale="+QLocale().name());
+    if (forceUpdate)
+        reqStr.append("&Version=" + JulyMath::byteArrayFromDouble(baseValues.appVerReal * 100000 - 100, 0));
+    else
+        reqStr.append("&Version=" + JulyMath::byteArrayFromDouble(baseValues.appVerReal * 100000, 0));
+
+    reqStr.append("&OS=" + osString);
+    reqStr.append("&Locale=" + QLocale().name());
 
     QString md5;
     QFile readSelf(QApplication::applicationFilePath());
-    if(readSelf.open(QIODevice::ReadOnly))
+
+    if (readSelf.open(QIODevice::ReadOnly))
     {
-        md5=QCryptographicHash::hash(readSelf.readAll(),QCryptographicHash::Md5).toHex();
+        md5 = QCryptographicHash::hash(readSelf.readAll(), QCryptographicHash::Md5).toHex();
         readSelf.close();
     }
-    reqStr.append("&MD5="+md5);
-    httpGet->sendData(140,"POST /",reqStr);
 
-	timeOutTimer->start(60000);
+    reqStr.append("&MD5=" + md5);
+    httpGet->sendData(140, "POST /", reqStr);
+
+    timeOutTimer->start(60000);
 }
 
 UpdaterDialog::~UpdaterDialog()
 {
-    QSettings settings(appDataDir+"/QtBitcoinTrader.cfg",QSettings::IniFormat);
-    settings.setValue("AutoUpdate",ui.againAutoUpdateCheckBox->isChecked());
+    QSettings settings(appDataDir + "/QtBitcoinTrader.cfg", QSettings::IniFormat);
+    settings.setValue("AutoUpdate", ui.againAutoUpdateCheckBox->isChecked());
 }
 
-QByteArray UpdaterDialog::getMidData(QString a, QString b,QByteArray *data)
+QByteArray UpdaterDialog::getMidData(QString a, QString b, QByteArray* data)
 {
-	QByteArray rez;
-	if(b.isEmpty())b="\",";
-	int startPos=data->indexOf(a,0);
-	if(startPos>-1)
-	{
-		int endPos=data->indexOf(b,startPos+a.length());
-		if(endPos>-1)rez=data->mid(startPos+a.length(),endPos-startPos-a.length());
-	}
-	return rez;
+    QByteArray rez;
+
+    if (b.isEmpty())
+        b = "\",";
+
+    int startPos = data->indexOf(a, 0);
+
+    if (startPos > -1)
+    {
+        int endPos = data->indexOf(b, startPos + a.length());
+
+        if (endPos > -1)
+            rez = data->mid(startPos + a.length(), endPos - startPos - a.length());
+    }
+
+    return rez;
 }
 
-void UpdaterDialog::dataReceived(QByteArray dataReceived,int reqType)
+void UpdaterDialog::dataReceived(QByteArray dataReceived, int reqType)
 {
-	timeOutTimer->stop();
+    timeOutTimer->stop();
 
-	if(stateUpdate==0)
-	{
-		if(dataReceived.size()>10245)exitSlot();
+    if (stateUpdate == 0)
+    {
+        if (dataReceived.size() > 50000)
+            exitSlot();
 
-		bool canAutoUpdate=false;
+        bool canAutoUpdate = false;
 #ifdef Q_OS_MAC
-		canAutoUpdate=true;
+        canAutoUpdate = true;
 #endif
 #ifdef Q_OS_WIN
-		canAutoUpdate=true;
+        canAutoUpdate = true;
 #endif
-        if(reqType==140)
-		{
-			updateVersion=getMidData("Version\":\"","\"",&dataReceived);
-			if(updateVersion.size()>2)updateVersion.insert(1,".");
-			updateSignature=getMidData("Hash\":\"","\"",&dataReceived);
-			if(!updateSignature.isEmpty())updateSignature=QByteArray::fromBase64(updateSignature);
-			updateChangeLog=getMidData("ChangeLog\":\"","\"",&dataReceived);
-			updateLink=getMidData("Binary\":\"","\"",&dataReceived).replace("\\/","/");
-		}
+#ifdef QTBUILDTARGETLINUX64
+        canAutoUpdate = true;
+#endif
 
-        if(reqType==120)
-		{
-		QMap<QString,QString>versionsMap;
-		QStringList dataList=QString(dataReceived).split("\n");
-		for(int n=0;n<dataList.count();n++)
-		{
-			QString varData=dataList.at(n);
-			int splitPos=varData.indexOf('=');
-			if(splitPos>-1)
-			{
-				QString varName=varData.left(splitPos);
-				varData.remove(0,splitPos+1);
-				versionsMap[varName]=varData;
-			}
-		}
-
-		QString os="Src";
+        if (reqType == 140)
+        {
+            QString os = "Src";
+#ifdef Q_OS_LINUX
+#ifdef QTBUILDTARGETLINUX64
+            os = "Linux64";
+#else
+            os = "Linux";
+#endif
+#endif
 #ifdef Q_OS_MAC
-		os="Mac";
+            os = "Mac";
 #endif
 #ifdef Q_OS_WIN
-		os="Win32";
+            os = "Win";
+
+            if (QSysInfo::windowsVersion() >  QSysInfo::WV_XP)
+            {
+                _SYSTEM_INFO sysinfo;
+                GetNativeSystemInfo(&sysinfo);
+
+                if (sysinfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64)
+                    os = "Win64";
+            }
+
 #endif
-		updateVersion=versionsMap.value(os+"Ver");
-		updateSignature=versionsMap.value(os+"Signature").toLatin1();
-		if(!updateSignature.isEmpty())updateSignature=QByteArray::fromBase64(updateSignature);
-		updateChangeLog=versionsMap.value(os+"ChangeLog");
-		updateLink=versionsMap.value(os+"Bin");
-		}
 
-        if(updateVersion.toDouble()<=baseValues.appVerReal)
-		{
-			if(feedbackMessage)
-			{
-				QMessageBox msgb;
-				msgb.setWindowFlags(Qt::WindowCloseButtonHint|Qt::WindowStaysOnTopHint);
-				msgb.setWindowTitle("Qt Bitcoin Trader");
-				msgb.setIcon(QMessageBox::Information);
-				msgb.setText(julyTr("UP_TO_DATE","Your version of Qt Bitcoin Trader is up to date."));
-				msgb.exec();
-			}
-			exitSlot();
-			return;
-		}
-		stateUpdate=1;
-		ui.autoUpdateGroupBox->setVisible(canAutoUpdate);
-		ui.changeLogText->setHtml(updateChangeLog);
-		ui.versionLabel->setText("v"+updateVersion);
+            updateVersion = getMidData("Version\":\"", "\"", &dataReceived);
 
-		julyTranslator.translateUi(this);
-		ui.iconLabel->setPixmap(QPixmap(":/Resources/QtBitcoinTrader.png"));
-		QSize minSizeHint=minimumSizeHint();
-		if(mainWindow.isValidSize(&minSizeHint))setFixedSize(minimumSizeHint());
-		show();
-	}
-	else
-		if(stateUpdate==1)
-		{
-			downloaded100=true;
-			QByteArray fileSha1=QCryptographicHash::hash(dataReceived,QCryptographicHash::Sha1);
-			QFile readPublicKey(":/Resources/Public.key");
-			if(!readPublicKey.open(QIODevice::ReadOnly)){QMessageBox::critical(this,windowTitle(),"Public.key is missing");return;}
-			QByteArray publicKey=readPublicKey.readAll();
-			QByteArray decrypted=JulyRSA::getSignature(updateSignature,publicKey);
-			if(decrypted==fileSha1)
-			{
-				QString curBin=QApplication::applicationFilePath();
-				QString updBin=curBin+".upd";
-				QString bkpBin=curBin+".bkp";
-				if(QFile::exists(updBin))QFile::remove(updBin);
-				if(QFile::exists(bkpBin))QFile::remove(bkpBin);
-				if(QFile::exists(updBin)||QFile::exists(bkpBin)){downloadError(1);return;}
-				{
-					QFile wrFile(updBin);
-					if(wrFile.open(QIODevice::WriteOnly|QIODevice::Truncate))
-					{
-						wrFile.write(dataReceived);
-						wrFile.close();
-					}else {downloadError(2);return;}
-				}
-				QByteArray fileData;
-				{
-					QFile opFile(updBin);
-					if(opFile.open(QIODevice::ReadOnly))fileData=opFile.readAll();
-					opFile.close();
-				}
-				if(QCryptographicHash::hash(fileData,QCryptographicHash::Sha1)!=fileSha1){downloadError(3);return;}
-				QFile::rename(curBin,bkpBin);
-				if(!QFile::exists(bkpBin)){downloadError(4);return;}
-				QFile::rename(updBin,curBin);
-				if(!QFile::exists(curBin)){QMessageBox::critical(this,windowTitle(),"Critical error. Please reinstall application. Download it from http://sourceforge.net/projects/bitcointrader/<br>File not exists: "+curBin+"<br>"+updBin);downloadError(5);return;}
+            if (updateVersion.size() > 2)
+                updateVersion.insert(1, ".");
+
+            updateSignature = getMidData("Hash\":\"", "\"", &dataReceived);
+
+            if (!updateSignature.isEmpty())
+                updateSignature = QByteArray::fromBase64(updateSignature);
+
+            updateChangeLog = getMidData("ChangeLog\":\"", "\"", &dataReceived);
+            updateLink = getMidData("Binary\":\"", "\"", &dataReceived).replace("\\/", "/");
+
+            versionSignature = getMidData("VersionHash\":\"", "\"", &dataReceived);
+
+            if (!versionSignature.isEmpty())
+                versionSignature = QByteArray::fromBase64(versionSignature);
+
+            QByteArray versionSha1 = QCryptographicHash::hash(os.toUtf8() +
+                                     updateVersion.toUtf8() +
+                                     updateChangeLog.toUtf8() +
+                                     updateLink.toUtf8(), QCryptographicHash::Sha1);
+
+            QFile readPublicKey(":/Resources/Public.key");
+
+            if (!readPublicKey.open(QIODevice::ReadOnly))
+            {
+                QMessageBox::critical(this, windowTitle(), "Public.key is missing");
+                return;
+            }
+
+            QByteArray publicKey = readPublicKey.readAll();
+
+            QByteArray decrypted = JulyRSA::getSignature(versionSignature, publicKey);
+
+            if (versionSignature.isEmpty() || versionSha1 != decrypted)
+            {
+                exitSlot();
+                return;
+            }
+        }
+
+        if (reqType == 120)
+        {
+            QMap<QString, QString>versionsMap;
+            QStringList dataList = QString(dataReceived).split("\n");
+
+            for (int n = 0; n < dataList.count(); n++)
+            {
+                QString varData = dataList.at(n);
+                int splitPos = varData.indexOf('=');
+
+                if (splitPos > -1)
+                {
+                    QString varName = varData.left(splitPos);
+                    varData.remove(0, splitPos + 1);
+                    versionsMap[varName] = varData;
+                }
+            }
+
 #ifdef Q_OS_MAC
-				QFile(curBin).setPermissions(QFile(bkpBin).permissions());
+            QString os = "Mac";
+#else
+#ifdef Q_OS_WIN
+            QString os = "Win32";
+
+            if (QSysInfo::windowsVersion() >  QSysInfo::WV_XP)
+            {
+                _SYSTEM_INFO sysinfo;
+                GetNativeSystemInfo(&sysinfo);
+
+                if (sysinfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64)
+                    os = "Win64";
+            }
+
+#else
+#ifdef Q_OS_LINUX
+#ifdef QTBUILDTARGETLINUX64
+            QString os = "Linux64";
+#else
+            QString os = "Linux";
 #endif
-				QMessageBox::information(this,windowTitle(),julyTr("UPDATED_SUCCESSFULLY","Application updated successfully. Please restart application to apply changes."));
-				QSettings settings(appDataDir+"/QtBitcoinTrader.cfg",QSettings::IniFormat);
-				settings.setValue("UpdateCheckRetryCount",0);
-				exitSlot();
-			}
-		}
+#else
+            QString os = "Src";
+#endif
+#endif
+#endif
+            updateVersion = versionsMap.value(os + "Ver");
+            updateSignature = versionsMap.value(os + "Signature").toLatin1();
+
+            if (!updateSignature.isEmpty())
+                updateSignature = QByteArray::fromBase64(updateSignature);
+
+            updateChangeLog = versionsMap.value(os + "ChangeLog");
+            updateLink = versionsMap.value(os + "Bin");
+        }
+
+        if (!forceUpdate)
+            if (updateVersion.toDouble() <= baseValues.appVerReal)
+            {
+                if (feedbackMessage)
+                {
+                    QMessageBox msgb;
+                    msgb.setWindowFlags(Qt::WindowCloseButtonHint | Qt::WindowStaysOnTopHint);
+                    msgb.setWindowTitle("Qt Bitcoin Trader");
+                    msgb.setIcon(QMessageBox::Information);
+                    msgb.setText(julyTr("UP_TO_DATE", "Your version of Qt Bitcoin Trader is up to date."));
+                    msgb.exec();
+                }
+
+                exitSlot();
+                return;
+            }
+
+        ui.againAutoUpdateCheckBox->setChecked(autoUpdate);
+        ui.autoUpdateGroupBox->setVisible(canAutoUpdate);
+        ui.changeLogText->setHtml(updateChangeLog);
+        ui.versionLabel->setText("v" + updateVersion);
+
+        julyTranslator.translateUi(this);
+        ui.iconLabel->setPixmap(QPixmap(":/Resources/QtBitcoinTrader.png"));
+        QSize minSizeHint = minimumSizeHint();
+
+        if (mainWindow.isValidSize(&minSizeHint))
+            setFixedSize(minimumSizeHint());
+
+        if (autoUpdate)
+            ui.buttonUpdate->click();
+        else
+            show();
+    }
+    else if (stateUpdate == 1)
+    {
+        downloaded100 = true;
+        QByteArray fileSha1 = QCryptographicHash::hash(dataReceived, QCryptographicHash::Sha1);
+        QFile readPublicKey(":/Resources/Public.key");
+
+        if (!readPublicKey.open(QIODevice::ReadOnly))
+        {
+            QMessageBox::critical(this, windowTitle(), "Public.key is missing");
+            return;
+        }
+
+        QByteArray publicKey = readPublicKey.readAll();
+        QByteArray decrypted = JulyRSA::getSignature(updateSignature, publicKey);
+
+        if (decrypted == fileSha1)
+        {
+            QString curBin = QApplication::applicationFilePath();
+            QString updBin = curBin + ".upd";
+            QString bkpBin = curBin + ".bkp";
+
+            if (QFile::exists(updBin))
+                QFile::remove(updBin);
+
+            if (QFile::exists(bkpBin))
+                QFile::remove(bkpBin);
+
+            if (QFile::exists(updBin) || QFile::exists(bkpBin))
+            {
+                downloadErrorFile(1);
+                return;
+            }
+
+            {
+                QFile wrFile(updBin);
+
+                if (wrFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+                {
+                    wrFile.write(dataReceived);
+                    wrFile.close();
+                }
+                else
+                {
+                    downloadErrorFile(2);
+                    return;
+                }
+            }
+
+            QByteArray fileData;
+            {
+                QFile opFile(updBin);
+
+                if (opFile.open(QIODevice::ReadOnly))
+                    fileData = opFile.readAll();
+
+                opFile.close();
+            }
+
+            if (QCryptographicHash::hash(fileData, QCryptographicHash::Sha1) != fileSha1)
+            {
+                QFile::remove(updBin);
+                downloadErrorFile(3);
+                return;
+            }
+
+#ifdef Q_OS_LINUX
+            QFile(updBin).setPermissions(QFile(curBin).permissions());
+            {
+                QProcess testProc;
+                testProc.setProcessChannelMode(QProcess::MergedChannels);
+                testProc.start(updBin, QStringList() << "/test");
+                testProc.waitForFinished(30000);
+                QByteArray testOut = testProc.readAll();
+
+                if (!testOut.contains("(-: OK :-)"))
+                {
+                    QFile::remove(updBin);
+                    QMessageBox::critical(this, windowTitle(),
+                                          "Looks like new version of app have dependency problems. Please download latest version from http://sourceforge.net/projects/bitcointrader and fix it manually\n\n"
+                                          + QString::fromUtf8(testOut));
+                    downloadErrorFile(11);
+                    return;
+                }
+            }
+#endif
+
+            QFile::rename(curBin, bkpBin);
+
+            if (!QFile::exists(bkpBin))
+            {
+                downloadErrorFile(4);
+                return;
+            }
+
+            QFile::rename(updBin, curBin);
+
+            if (!QFile::exists(curBin))
+            {
+                QMessageBox::critical(this, windowTitle(),
+                                      "Critical error. Please reinstall application. Download it from http://sourceforge.net/projects/bitcointrader/<br>File not exists: "
+                                      + curBin + "<br>" + updBin);
+                downloadErrorFile(5);
+                return;
+            }
+
+#ifdef Q_OS_MAC
+            QFile(curBin).setPermissions(QFile(bkpBin).permissions());
+#endif
+#ifdef Q_OS_LINUX
+            QFile(curBin).setPermissions(QFile(bkpBin).permissions());
+#endif
+
+            if (!autoUpdate)
+                QMessageBox::information(this, windowTitle(), julyTr("UPDATED_SUCCESSFULLY",
+                                         "Application updated successfully. Please restart application to apply changes."));
+
+            QSettings settings(appDataDir + "/QtBitcoinTrader.cfg", QSettings::IniFormat);
+            settings.setValue("UpdateCheckRetryCount", 0);
+            exitSlot();
+        }
+        else
+            downloadErrorFile(12);
+    }
 }
 
 void UpdaterDialog::exitSlot()
 {
-	QCoreApplication::quit();
+    QCoreApplication::quit();
 }
 
 void UpdaterDialog::buttonUpdate()
 {
-	ui.buttonUpdate->setEnabled(false);
-	if(httpGet)delete httpGet;
-	QStringList tempList=updateLink.split("//");
-	if(tempList.count()!=2){downloadError(6);return;}
-	QString protocol=tempList.first();
-	tempList=tempList.last().split("/");
-	if(tempList.count()==0){downloadError(7);return;}
-	QString domain=tempList.first();
-	int removeLength=domain.length()+protocol.length()+2;
-	if(updateLink.length()<=removeLength){downloadError(8);return;}
-	updateLink.remove(0,removeLength);
+    stateUpdate = 1;
+    ui.buttonUpdate->setEnabled(false);
+    QStringList tempList = updateLink.split("//");
 
-	httpGet=new JulyHttp(domain,0,this,protocol.startsWith("https"),false);
-	connect(httpGet,SIGNAL(apiDown(bool)),this,SLOT(invalidData(bool)));
-	connect(httpGet,SIGNAL(dataProgress(int)),this,SLOT(dataProgress(int)));
-	connect(httpGet,SIGNAL(dataReceived(QByteArray,int)),this,SLOT(dataReceived(QByteArray,int)));
-    httpGet->noReconnect=true;
+    if (tempList.count() != 2)
+    {
+        downloadError(6);
+        return;
+    }
 
-    httpGet->sendData(120,"GET "+updateLink.toLatin1());
+    QString protocol = tempList.first();
+    tempList = tempList.last().split("/");
+
+    if (tempList.count() == 0)
+    {
+        downloadError(7);
+        return;
+    }
+
+    QString domain = tempList.first();
+    int removeLength = domain.length() + protocol.length() + 2;
+
+    if (updateLink.length() <= removeLength)
+    {
+        downloadError(8);
+        return;
+    }
+
+    updateLink.remove(0, removeLength);
+
+    httpGetFile = new JulyHttp(domain, nullptr, this, protocol.startsWith("https"), false);
+    connect(httpGetFile, SIGNAL(apiDown(bool)), this, SLOT(invalidData(bool)));
+    connect(httpGetFile, SIGNAL(dataProgress(int)), this, SLOT(dataProgress(int)));
+    connect(httpGetFile, SIGNAL(dataReceived(QByteArray, int)), this, SLOT(dataReceived(QByteArray, int)));
+    httpGetFile->noReconnect = true;
+
+    httpGetFile->sendData(120, "GET " + updateLink.toLatin1());
 }
 
 void UpdaterDialog::invalidData(bool err)
 {
-	if(err)downloadError(9);
+    if (err)
+        downloadErrorFile(9);
 }
 
 void UpdaterDialog::downloadError(int val)
 {
-	if(downloaded100)return;
-	QMessageBox::warning(this,windowTitle(),julyTr("DOWNLOAD_ERROR","Download error. Please try again.")+"<br>"+httpGet->errorString()+"<br>CODE: "+QString::number(val));
+    if (downloaded100)
+        return;
 
-	QSettings settings(appDataDir+"/QtBitcoinTrader.cfg",QSettings::IniFormat);
-	settings.setValue("UpdateCheckRetryCount",settings.value("UpdateCheckRetryCount",0).toInt()+1);
+    QMessageBox::warning(this, windowTitle(), julyTr("DOWNLOAD_ERROR",
+                         "Download error. Please try again.") + "<br>" + httpGet->errorString() + "<br>CODE: " + QString::number(val));
 
-	exitSlot();
+    QSettings settings(appDataDir + "/QtBitcoinTrader.cfg", QSettings::IniFormat);
+    settings.setValue("UpdateCheckRetryCount", settings.value("UpdateCheckRetryCount", 0).toInt() + 1);
+
+    exitSlot();
+}
+
+void UpdaterDialog::downloadErrorFile(int val)
+{
+    if (downloaded100)
+        return;
+
+    QMessageBox::warning(this, windowTitle(), julyTr("DOWNLOAD_ERROR",
+                         "Download error. Please try again.") + "<br>" + httpGetFile->errorString() + "<br>CODE: " + QString::number(val));
+
+    QSettings settings(appDataDir + "/QtBitcoinTrader.cfg", QSettings::IniFormat);
+    settings.setValue("UpdateCheckRetryCount", settings.value("UpdateCheckRetryCount", 0).toInt() + 1);
+
+    exitSlot();
 }
 
 void UpdaterDialog::dataProgress(int precent)
 {
-	if(httpGet->getCurrentPacketContentLength()>20000000)downloadError(10);
-	ui.progressBar->setValue(precent);
+    if (httpGetFile->getCurrentPacketContentLength() > 300000000)
+        downloadErrorFile(10);
+
+    ui.progressBar->setValue(precent);
 }

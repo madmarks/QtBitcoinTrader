@@ -1,6 +1,6 @@
-//  This file is part of Qt Bitcion Trader
+//  This file is part of Qt Bitcoin Trader
 //      https://github.com/JulyIGHOR/QtBitcoinTrader
-//  Copyright (C) 2013-2015 July IGHOR <julyighor@gmail.com>
+//  Copyright (C) 2013-2018 July IGHOR <julyighor@gmail.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -37,16 +37,16 @@
 
 class ThisFeatureUnderDevelopment : public QDialog
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	ThisFeatureUnderDevelopment(QWidget *parent=0);
-	~ThisFeatureUnderDevelopment();
+    explicit ThisFeatureUnderDevelopment(QWidget* parent = 0);
+    ~ThisFeatureUnderDevelopment();
 
 private:
-	Ui::ThisFeatureUnderDevelopment ui;
+    Ui::ThisFeatureUnderDevelopment ui;
 private slots:
-	void themeChanged();
+    void themeChanged();
 };
 
 #endif // THISFEATUREUNDERDEVELOPMENT_H
